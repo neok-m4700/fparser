@@ -150,7 +150,7 @@ class Assign(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'ASSIGN %s TO %s' \
+        return self.get_indent_tab(isfix=isfix) + 'assign %s to %s' \
             % (self.items[0], self.items[1])
 
     def analyze(self): return
@@ -201,7 +201,7 @@ class Call(Statement):
         return
 
     def tofortran(self, isfix=None):
-        s = self.get_indent_tab(isfix=isfix) + 'CALL ' + str(self.designator)
+        s = self.get_indent_tab(isfix=isfix) + 'call ' + str(self.designator)
         if self.items:
             s += '(' + ', '.join(map(str, self.items)) + ')'
         return s
@@ -228,7 +228,7 @@ class Goto(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'GO TO %s' % (self.label)
+        return self.get_indent_tab(isfix=isfix) + 'go to %s' % (self.label)
 
     def analyze(self): return
 
@@ -241,7 +241,8 @@ class PreProcessor(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.item.get_line().lstrip()
+        # return self.item.get_line().lstrip()
+        return self.item.line.lstrip()
 
     def analyze(self): return
 
@@ -264,7 +265,7 @@ class ComputedGoto(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return  self.get_indent_tab(isfix=isfix) + 'GO TO (%s) %s' \
+        return  self.get_indent_tab(isfix=isfix) + 'go to (%s) %s' \
             % (', '.join(self.items), self.expr)
 
     def analyze(self): return
@@ -293,9 +294,9 @@ class AssignedGoto(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if self.items:
-            return tab + 'GO TO %s (%s)' \
+            return tab + 'go to %s (%s)' \
                 % (self.varname, ', '.join(self.items))
-        return tab + 'GO TO %s' % (self.varname)
+        return tab + 'go to %s' % (self.varname)
 
     def analyze(self): return
 
@@ -311,7 +312,7 @@ class Continue(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(deindent=True) + 'CONTINUE'
+        return self.get_indent_tab(deindent=True) + 'continue'
 
     def analyze(self): return
 
@@ -329,8 +330,8 @@ class Return(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if self.expr:
-            return tab + 'RETURN %s' % (self.expr)
-        return tab + 'RETURN'
+            return tab + 'return %s' % (self.expr)
+        return tab + 'return'
 
     def analyze(self): return
 
@@ -349,8 +350,8 @@ class Stop(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if self.code:
-            return tab + 'STOP %s' % (self.code)
-        return tab + 'STOP'
+            return tab + 'stop %s' % (self.code)
+        return tab + 'stop'
 
     def analyze(self): return
 
@@ -378,7 +379,7 @@ class Print(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'PRINT %s' \
+        return self.get_indent_tab(isfix=isfix) + 'print %s' \
             % (', '.join([self.format] + self.items))
 
     def analyze(self): return
@@ -423,7 +424,7 @@ class Read0(Read):
         return
 
     def tofortran(self, isfix=None):
-        s = self.get_indent_tab(isfix=isfix) + 'READ (%s)' % (', '.join(self.specs))
+        s = self.get_indent_tab(isfix=isfix) + 'read (%s)' % (', '.join(self.specs))
         if self.items:
             return s + ' ' + ', '.join(self.items)
         return s
@@ -440,7 +441,7 @@ class Read1(Read):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'READ ' \
+        return self.get_indent_tab(isfix=isfix) + 'read ' \
             + ', '.join([self.format] + self.items)
 
 
@@ -460,7 +461,7 @@ class Write(Statement):
         return
 
     def tofortran(self, isfix=None):
-        s = self.get_indent_tab(isfix=isfix) + 'WRITE (%s)' % ', '.join(self.specs)
+        s = self.get_indent_tab(isfix=isfix) + 'write (%s)' % ', '.join(self.specs)
         if self.items:
             s += ' ' + ', '.join(self.items)
         return s
@@ -493,7 +494,7 @@ class Flush(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'FLUSH (%s)' % (', '.join(self.specs))
+        return tab + 'flush (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
 
@@ -519,7 +520,7 @@ class Wait(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'WAIT (%s)' % (', '.join(self.specs))
+        return tab + 'wait (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
 
@@ -532,7 +533,7 @@ class Contains(Statement):
 
     def process_item(self): return
 
-    def tofortran(self, isfix=None): return self.get_indent_tab(isfix=isfix) + 'CONTAINS'
+    def tofortran(self, isfix=None): return self.get_indent_tab(isfix=isfix) + 'contains'
 
 
 class Allocate(Statement):
@@ -575,7 +576,7 @@ class Allocate(Statement):
         if self.spec:
             t = self.spec.tostr() + ' :: '
         return self.get_indent_tab(isfix=isfix) \
-            + 'ALLOCATE (%s%s)' % (t, ', '.join(self.items))
+            + 'allocate (%s%s)' % (t, ', '.join(self.items))
 
     def analyze(self): return
 
@@ -597,7 +598,7 @@ class Deallocate(Statement):
         return
 
     def tofortran(self, isfix=None): return self.get_indent_tab(isfix=isfix) \
-        + 'DEALLOCATE (%s)' % (', '.join(self.items))
+        + 'deallocate (%s)' % (', '.join(self.items))
 
     def analyze(self): return
 
@@ -622,7 +623,7 @@ class ModuleProcedure(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'MODULE PROCEDURE %s' % (', '.join(self.items))
+        return tab + 'module procedure %s' % (', '.join(self.items))
 
     def analyze(self):
         module_procedures = self.parent.a.module_procedures
@@ -652,7 +653,7 @@ class Access(Statement):
         return
 
     def tofortran(self, isfix=None):
-        clsname = self.__class__.__name__.upper()
+        clsname = self.__class__.__name__.lower()
         tab = self.get_indent_tab(isfix=isfix)
         if self.items:
             return tab + clsname + ' ' + ', '.join(self.items)
@@ -711,7 +712,7 @@ class Close(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'CLOSE (%s)' % (', '.join(self.specs))
+        return tab + 'close (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
 
@@ -728,8 +729,8 @@ class Cycle(Statement):
 
     def tofortran(self, isfix=None):
         if self.name:
-            return self.get_indent_tab(isfix=isfix) + 'CYCLE ' + self.name
-        return self.get_indent_tab(isfix=isfix) + 'CYCLE'
+            return self.get_indent_tab(isfix=isfix) + 'cycle ' + self.name
+        return self.get_indent_tab(isfix=isfix) + 'cycle'
 
     def analyze(self): return
 
@@ -762,7 +763,7 @@ class FilePositioningStatement(Statement):
         return
 
     def tofortran(self, isfix=None):
-        clsname = self.__class__.__name__.upper()
+        clsname = self.__class__.__name__.lower()
         return self.get_indent_tab(isfix=isfix) + clsname + ' (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
@@ -795,7 +796,7 @@ class Open(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'OPEN (%s)' % (', '.join(self.specs))
+        return self.get_indent_tab(isfix=isfix) + 'open (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
 
@@ -838,7 +839,7 @@ class Format(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'FORMAT (%s)' % (', '.join(self.specs))
+        return self.get_indent_tab(isfix=isfix) + 'format (%s)' % (', '.join(self.specs))
 
     def analyze(self): return
 
@@ -880,8 +881,8 @@ class Save(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if not self.items:
-            return tab + 'SAVE'
-        return tab + 'SAVE %s' % (', '.join(self.items))
+            return tab + 'save'
+        return tab + 'save %s' % (', '.join(self.items))
 
     def analyze(self): return
 
@@ -933,7 +934,7 @@ class Data(Statement):
         l = []
         for o, v in self.stmts:
             l.append('%s / %s /' % (', '.join(o), ', '.join(v)))
-        return tab + 'DATA ' + ' '.join(l)
+        return tab + 'data ' + ' '.join(l)
 
     def analyze(self): return
 
@@ -951,7 +952,7 @@ class Nullify(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'NULLIFY (%s)' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'nullify (%s)' % (', '.join(self.items))
 
     def analyze(self): return
 
@@ -997,12 +998,12 @@ class Use(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = 'USE'
+        s = 'use'
         if self.nature:
             s += ' ' + self.nature + ' ::'
         s += ' ' + self.name
         if self.isonly:
-            s += ', ONLY:'
+            s += ', only:'
         elif self.items:
             s += ','
         if self.items:
@@ -1084,8 +1085,8 @@ class Exit(Statement):
 
     def tofortran(self, isfix=None):
         if self.name:
-            return self.get_indent_tab(isfix=isfix) + 'EXIT ' + self.name
-        return self.get_indent_tab(isfix=isfix) + 'EXIT'
+            return self.get_indent_tab(isfix=isfix) + 'exit ' + self.name
+        return self.get_indent_tab(isfix=isfix) + 'exit'
 
     def analyze(self): return
 
@@ -1103,7 +1104,7 @@ class Parameter(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'PARAMETER (%s)' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'parameter (%s)' % (', '.join(self.items))
 
     def analyze(self):
         for item in self.items:
@@ -1136,7 +1137,7 @@ class Equivalence(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'EQUIVALENCE %s' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'equivalence %s' % (', '.join(self.items))
 
     def analyze(self): return
 
@@ -1156,7 +1157,7 @@ class Dimension(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'DIMENSION %s' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'dimension %s' % (', '.join(self.items))
 
     def analyze(self):
         for line in self.items:
@@ -1184,7 +1185,7 @@ class Target(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'TARGET %s' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'target %s' % (', '.join(self.items))
 
     def analyze(self):
         for line in self.items:
@@ -1215,7 +1216,7 @@ class Pointer(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'POINTER %s' % (', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'pointer %s' % (', '.join(self.items))
 
     def analyze(self):
         for line in self.items:
@@ -1288,7 +1289,7 @@ class ArithmeticIf(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'IF (%s) %s' \
+        return self.get_indent_tab(isfix=isfix) + 'if (%s) %s' \
             % (self.expr, ', '.join(self.labels))
 
     def analyze(self): return
@@ -1329,9 +1330,9 @@ class Inquire(Statement):
 
     def tofortran(self, isfix=None):
         if self.items:
-            return self.get_indent_tab(isfix=isfix) + 'INQUIRE (%s) %s' \
+            return self.get_indent_tab(isfix=isfix) + 'inquire (%s) %s' \
                 % (', '.join(self.specs), ', '.join(self.items))
-        return self.get_indent_tab(isfix=isfix) + 'INQUIRE (%s)' \
+        return self.get_indent_tab(isfix=isfix) + 'inquire (%s)' \
             % (', '.join(self.specs))
 
     def analyze(self): return
@@ -1346,10 +1347,10 @@ class Sequence(Statement):
     def process_item(self):
         return
 
-    def tofortran(self, isfix=None): return self.get_indent_tab(isfix=isfix) + 'SEQUENCE'
+    def tofortran(self, isfix=None): return self.get_indent_tab(isfix=isfix) + 'sequence'
 
     def analyze(self):
-        self.parent.update_attributes('SEQUENCE')
+        self.parent.update_attributes('sequence')
         return
 
 
@@ -1400,7 +1401,7 @@ class Namelist(Statement):
         for name, s in self.items:
             l.append('%s %s' % (name, s))
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'NAMELIST ' + ', '.join(l)
+        return tab + 'namelist ' + ', '.join(l)
 
 
 class Common(Statement):
@@ -1447,7 +1448,7 @@ class Common(Statement):
             else:
                 l.append(s)
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'COMMON ' + ' '.join(l)
+        return tab + 'common ' + ' '.join(l)
 
     def analyze(self):
         for cname, items in self.items:
@@ -1507,7 +1508,7 @@ class Intent(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'INTENT (%s) %s' \
+        return self.get_indent_tab(isfix=isfix) + 'intent (%s) %s' \
             % (', '.join(self.specs), ', '.join(self.items))
 
     def analyze(self):
@@ -1552,13 +1553,13 @@ class Entry(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = tab + 'ENTRY ' + self.name
+        s = tab + 'entry ' + self.name
         if self.items:
             s += ' (%s)' % (', '.join(self.items))
         if self.result:
-            s += ' RESULT (%s)' % (self.result)
+            s += ' result (%s)' % (self.result)
         if self.bind:
-            s += ' BIND (%s)' % (', '.join(self.bind))
+            s += ' bind (%s)' % (', '.join(self.bind))
         return s
 
 
@@ -1630,7 +1631,7 @@ class Forall(Statement):
         s = ', '.join(l)
         if self.mask:
             s += ', ' + self.mask
-        return tab + 'FORALL (%s) %s' % \
+        return tab + 'forall (%s) %s' % \
             (s, str(self.content[0]).lstrip())
 
     def analyze(self): return
@@ -1688,7 +1689,7 @@ class SpecificBinding(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = 'PROCEDURE '
+        s = 'procedure '
         if self.iname:
             s += '(' + self.iname + ') '
         if self.attrs:
@@ -1720,7 +1721,7 @@ class GenericBinding(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = 'GENERIC'
+        s = 'generic'
         if self.aspec:
             s += ', ' + self.aspec
         s += ' :: ' + self.spec + ' => ' + ', '.join(self.items)
@@ -1749,7 +1750,7 @@ class Allocatable(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'ALLOCATABLE ' + ', '.join(self.items)
+        return self.get_indent_tab(isfix=isfix) + 'allocatable ' + ', '.join(self.items)
 
     def analyze(self):
         for line in self.items:
@@ -1804,7 +1805,7 @@ class Bind(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'BIND (%s) %s' %\
+        return self.get_indent_tab(isfix=isfix) + 'bind (%s) %s' %\
             (', '.join(self.specs), ', '.join(self.items))
 
 # IF construct statements
@@ -1828,8 +1829,8 @@ class Else(Statement):
 
     def tofortran(self, isfix=None):
         if self.name:
-            return self.get_indent_tab(deindent=True) + 'ELSE ' + self.name
-        return self.get_indent_tab(deindent=True) + 'ELSE'
+            return self.get_indent_tab(deindent=True) + 'else ' + self.name
+        return self.get_indent_tab(deindent=True) + 'else'
 
     def analyze(self): return
 
@@ -1858,7 +1859,7 @@ class ElseIf(Statement):
         s = ''
         if self.name:
             s = ' ' + self.name
-        return self.get_indent_tab(deindent=True) + 'ELSE IF (%s) THEN%s' \
+        return self.get_indent_tab(deindent=True) + 'Else if (%s) then%s' \
             % (self.expr, s)
 
     def analyze(self): return
@@ -1906,14 +1907,14 @@ class Case(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = 'CASE'
+        s = 'case'
         if self.items:
             l = []
             for item in self.items:
                 l.append((' : '.join(item)).strip())
             s += ' ( %s )' % (', '.join(l))
         else:
-            s += ' DEFAULT'
+            s += ' default'
         if self.name:
             s += ' ' + self.name
         return s
@@ -1946,7 +1947,7 @@ class Where(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        return tab + 'WHERE ( %s ) %s' % (self.expr, str(self.content[0]).lstrip())
+        return tab + 'where ( %s ) %s' % (self.expr, str(self.content[0]).lstrip())
 
     def analyze(self): return
 
@@ -1978,7 +1979,7 @@ class ElseWhere(Statement):
 
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
-        s = 'ELSE WHERE'
+        s = 'else where'
         if self.expr is not None:
             s += ' ( %s )' % (self.expr)
         if self.name:
@@ -2005,7 +2006,7 @@ class Enumerator(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'ENUMERATOR ' + ', '.join(self.items)
+        return self.get_indent_tab(isfix=isfix) + 'enumerator ' + ', '.join(self.items)
 
 # F2PY specific statements
 
@@ -2021,7 +2022,7 @@ class FortranName(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'FORTRANNAME ' + self.value
+        return self.get_indent_tab(isfix=isfix) + 'fortranname ' + self.value
 
 
 class Threadsafe(Statement):
@@ -2034,7 +2035,7 @@ class Threadsafe(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'THREADSAFE'
+        return self.get_indent_tab(isfix=isfix) + 'threadsafe'
 
 
 class Depend(Statement):
@@ -2055,7 +2056,7 @@ class Depend(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'DEPEND ( %s ) %s' \
+        return self.get_indent_tab(isfix=isfix) + 'depend ( %s ) %s' \
             % (', '.join(self.depends), ', '.join(self.items))
 
 
@@ -2078,7 +2079,7 @@ class Check(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'CHECK ( %s ) %s' \
+        return self.get_indent_tab(isfix=isfix) + 'check ( %s ) %s' \
             % (self.expr, self.value)
 
 
@@ -2093,7 +2094,7 @@ class CallStatement(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'CALLSTATEMENT ' + self.expr
+        return self.get_indent_tab(isfix=isfix) + 'callstatement ' + self.expr
 
 
 class CallProtoArgument(Statement):
@@ -2107,7 +2108,7 @@ class CallProtoArgument(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'CALLPROTOARGUMENT ' + self.specs
+        return self.get_indent_tab(isfix=isfix) + 'callprotoargument ' + self.specs
 
 # Non-standard statements
 
@@ -2124,8 +2125,8 @@ class Pause(Statement):
 
     def tofortran(self, isfix=None):
         if self.value:
-            return self.get_indent_tab(isfix=isfix) + 'PAUSE ' + self.value
-        return self.get_indent_tab(isfix=isfix) + 'PAUSE'
+            return self.get_indent_tab(isfix=isfix) + 'pause ' + self.value
+        return self.get_indent_tab(isfix=isfix) + 'pause'
 
     def analyze(self): return
 
@@ -2152,7 +2153,7 @@ class Comment(Statement):
         if self.is_blank:
             return ''
         if isfix:
-            tab = 'C' + self.get_indent_tab(isfix=isfix)[1:]
+            tab = 'c' + self.get_indent_tab(isfix=isfix)[1:]
         else:
             tab = self.get_indent_tab(isfix=isfix) + '!'
         return tab + self.content

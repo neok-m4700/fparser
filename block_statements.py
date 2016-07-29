@@ -55,7 +55,7 @@ class HasImplicitStmt(object):
     def topyf(self, tab='  '):
         implicit_rules = self.a.implicit_rules
         if implicit_rules is None:
-            return tab + 'IMPLICIT NONE\n'
+            return tab + 'implicit none\n'
         items = {}
         for c, t in implicit_rules.items():
             if c.startswith('default'):
@@ -66,8 +66,8 @@ class HasImplicitStmt(object):
             else:
                 items[st] = [c]
         if not items:
-            return tab + '! default IMPLICIT rules apply\n'
-        s = 'IMPLICIT'
+            return tab + '! default implicit rules apply\n'
+        s = 'implicit'
         ls = []
         for st, l in items.items():
             l.sort()
@@ -102,17 +102,17 @@ class AccessSpecs(object):
         public_list = self.a.public_id_list
         l = []
         if '' in private_list:
-            l.append(tab + 'PRIVATE\n')
+            l.append(tab + 'private\n')
         if '' in public_list:
-            l.append(tab + 'PUBLIC\n')
+            l.append(tab + 'public\n')
         for a in private_list:
             if not a:
                 continue
-            l.append(tab + 'PRIVATE :: %s\n' % (a))
+            l.append(tab + 'private :: %s\n' % (a))
         for a in public_list:
             if not a:
                 continue
-            l.append(tab + 'PUBLIC :: %s\n' % (a))
+            l.append(tab + 'public :: %s\n' % (a))
         return ''.join(l)
 
 
@@ -216,7 +216,7 @@ class BeginSource(BeginStatement):
 
     def tofortran(self, isfix=None):
         if isfix:
-            tab = 'C'
+            tab = 'c'
         else:
             tab = self.get_indent_tab(isfix=isfix) + '!'
         return tab + BeginStatement.tofortran(self, isfix=isfix)
@@ -305,7 +305,7 @@ class Module(BeginStatement, HasAttributes,
                         module_interface={}
                         )
 
-    known_attributes = ['PUBLIC', 'PRIVATE']
+    known_attributes = ['public', 'private']
 
     def get_classes(self):
         return access_spec + specification_part + module_subprogram_part
@@ -352,7 +352,7 @@ class Module(BeginStatement, HasAttributes,
         return
 
     def topyf(self, tab=''):
-        s = tab + 'MODULE ' + self.name + '\n'
+        s = tab + 'module ' + self.name + '\n'
         s += HasImplicitStmt.topyf(self, tab=tab + '  ')
         s += AccessSpecs.topyf(self, tab=tab + '  ')
         s += HasAttributes.topyf(self, tab=tab + '  ')
@@ -360,10 +360,10 @@ class Module(BeginStatement, HasAttributes,
         s += HasVariables.topyf(self, tab=tab + '  ')
         for name, stmt in self.a.module_interface.items():
             s += stmt.topyf(tab=tab + '    ')
-        s += tab + '  CONTAINS\n'
+        s += tab + '  contains\n'
         for name, stmt in self.a.module_subprogram.items():
             s += stmt.topyf(tab=tab + '    ')
-        s += tab + 'END MODULE ' + self.name + '\n'
+        s += tab + 'end module ' + self.name + '\n'
         return s
 
     def check_private(self, name):
@@ -428,8 +428,7 @@ class Program(BeginStatement, ProgramBlock,
 
     def process_item(self):
         if self.item is not None:
-            name = self.item.get_line().replace(' ', '')\
-                [len(self.blocktype):].strip()
+            name = self.item.get_line().replace(' ', '')[len(self.blocktype):].strip()
             if name:
                 self.name = name
         return BeginStatement.process_item(self)
@@ -511,8 +510,8 @@ class Interface(BeginStatement, HasAttributes, HasImplicitStmt, HasUseStmt,
 
     def tostr(self):
         if self.isabstract:
-            return 'ABSTRACT INTERFACE'
-        return 'INTERFACE ' + str(self.generic_spec)
+            return 'abstract interface'
+        return 'interface ' + str(self.generic_spec)
 
     # def get_provides(self):
     #    return self.a.interface_provides
@@ -551,7 +550,7 @@ class Interface(BeginStatement, HasAttributes, HasImplicitStmt, HasUseStmt,
         s += HasImplicitStmt.topyf(self, tab=tab + '  ')
         s += HasAttributes.topyf(self, tab=tab + '  ')
         s += HasUseStmt.topyf(self, tab=tab + '  ')
-        s += tab + 'END' + self.tostr() + '\n'
+        s += tab + 'end' + self.tostr() + '\n'
         return s
 
 # Subroutine
@@ -567,7 +566,7 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
     """
 
     a = AttributeHolder(internal_subprogram={})
-    known_attributes = ['RECURSIVE', 'PURE', 'ELEMENTAL']
+    known_attributes = ['recursive', 'pure', 'elemental']
 
     def process_item(self):
         clsname = self.__class__.__name__.lower()
@@ -606,7 +605,8 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         return BeginStatement.process_item(self)
 
     def tostr(self):
-        clsname = self.__class__.__name__.upper()
+        # clsname = self.__class__.__name__.upper()
+        clsname = self.__class__.__name__.lower()
         s = ''
         if self.prefix:
             s += self.prefix + ' '
@@ -616,9 +616,9 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         s += clsname
         suf = ''
         if self.result and self.result != self.name:
-            suf += ' RESULT ( %s )' % (self.result)
+            suf += ' result ( %s )' % (self.result)
         if self.bind:
-            suf += ' BIND ( %s )' % (', '.join(self.bind))
+            suf += ' bind ( %s )' % (', '.join(self.bind))
         return '%s %s(%s)%s' % (s, self.name, ', '.join(self.args), suf)
 
     def get_classes(self):
@@ -629,7 +629,7 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         content = self.content[:]
 
         if self.prefix:
-            self.update_attributes(self.prefix.upper().split())
+            self.update_attributes(self.prefix.split())
 
         variables = self.a.variables
         for a in self.args:
@@ -677,27 +677,27 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         return
 
     def topyf(self, tab=''):
-        s = tab + self.__class__.__name__.upper()
+        s = tab + self.__class__.__name__  # .upper()
         s += ' ' + self.name + ' (%s)' % (', '.join(self.args))
         if isinstance(self, Function) and self.result != self.name:
-            s += ' RESULT (%s)' % (self.result)
+            s += ' result (%s)' % (self.result)
         s += '\n'
         s += HasImplicitStmt.topyf(self, tab=tab + '  ')
         s += AccessSpecs.topyf(self, tab=tab + '  ')
         s += HasTypeDecls.topyf(self, tab=tab + '  ')
         s += HasVariables.topyf(self, tab=tab + '  ', only_variables=self.args)
-        s += tab + 'END ' + self.__class__.__name__.upper() + ' ' + self.name + '\n'
+        s += tab + 'end ' + self.__class__.__name__ + ' ' + self.name + '\n'
         return s
 
     def is_public(self): return not self.is_private()
 
     def is_private(self): return self.parent.check_private(self.name)
 
-    def is_recursive(self): return 'RECURSIVE' in self.a.attributes
+    def is_recursive(self): return 'recursive' in self.a.attributes
 
-    def is_pure(self): return 'PURE' in self.a.attributes
+    def is_pure(self): return 'pure' in self.a.attributes
 
-    def is_elemental(self): return 'ELEMENTAL' in self.a.attributes
+    def is_elemental(self): return 'elemental' in self.a.attributes
 
 
 class EndSubroutine(EndStatement):
@@ -745,16 +745,16 @@ class Function(SubProgramStatement):
         typedecl = var.get_typedecl().astypedecl()
         lines = []
         tab = ' ' * 6
-        lines.append('%sSUBROUTINE %s(%s)' % (tab, name, ', '.join(args)))
+        lines.append('%ssubroutine %s(%s)' % (tab, name, ', '.join(args)))
         if isinstance(self.parent, Module):
-            lines.append('%s  USE %s' % (tab, self.parent.name))
+            lines.append('%s  use %s' % (tab, self.parent.name))
         else:
             if isinstance(typedecl, TypeStmt):
                 type_decl = typedecl.get_type_decl(typedecl.name)
                 if type_decl.parent is self:
                     for line in str(type_decl).split('\n'):
                         lines.append('%s  %s' % (tab, line.lstrip()))
-            lines.append('%s  EXTERNAL %s' % (tab, self.name))
+            lines.append('%s  external %s' % (tab, self.name))
             lines.append('%s  %s %s' % (tab, str(typedecl).lstrip(), self.name))
         lines.append('%s  %s %s' % (tab, str(typedecl).lstrip(), args[0]))
         lines.append('!f2py intent(out) %s' % (args[0]))
@@ -763,7 +763,7 @@ class Function(SubProgramStatement):
             lines.append('%s  %s' % (tab, str(v).lstrip()))
         lines.append('%s  %s = %s(%s)' % (tab, args[0], self.name, ', '.join(self.args)))
         # lines.append('%s  print*,"%s=",%s' % (tab, args[0], args[0])) # debug line
-        lines.append('%sEND SUBROUTINE %s' % (tab, name))
+        lines.append('%send subroutine %s' % (tab, name))
         return '\n'.join(lines)
 
     def subroutine_wrapper(self):
@@ -819,7 +819,7 @@ class Select(BeginStatement):
     name = ''
 
     def tostr(self):
-        return 'SELECT CASE ( %s )' % (self.expr)
+        return 'select case ( %s )' % (self.expr)
 
     def process_item(self):
         self.expr = self.item.get_line()[6:].lstrip()[4:].lstrip()[1:-1].strip()
@@ -849,7 +849,7 @@ class Where(BeginStatement):
     name = ''
 
     def tostr(self):
-        return 'WHERE ( %s )' % (self.expr)
+        return 'where ( %s )' % (self.expr)
 
     def process_item(self):
         self.expr = self.item.get_line()[5:].lstrip()[1:-1].strip()
@@ -896,7 +896,7 @@ class Forall(BeginStatement):
         return BeginStatement.process_item(self)
 
     def tostr(self):
-        return 'FORALL (%s)' % (self.specs)
+        return 'forall (%s)' % (self.specs)
 
     def get_classes(self):
         return [GeneralAssignment, WhereStmt, WhereConstruct,
@@ -928,7 +928,7 @@ class IfThen(BeginStatement):
     name = ''
 
     def tostr(self):
-        return 'IF (%s) THEN' % (self.expr)
+        return 'if (%s) then' % (self.expr)
 
     def process_item(self):
         item = self.item
@@ -940,6 +940,7 @@ class IfThen(BeginStatement):
 
     def get_classes(self):
         return [Else, ElseIf] + execution_part_construct
+
 
 class If(BeginStatement):
     """
@@ -981,7 +982,7 @@ class If(BeginStatement):
 
     def tostr(self):
         assert len(self.content) == 1, `self.content`
-        return 'IF (%s) %s' % (self.expr, str(self.content[0]).lstrip())
+        return 'if (%s) %s' % (self.expr, str(self.content[0]).lstrip())
 
     def tofortran(self, isfix=None):
         return self.get_indent_tab(isfix=isfix) + self.tostr()
@@ -1013,7 +1014,7 @@ class Do(BeginStatement):
     name = ''
 
     def tostr(self):
-        l = ['DO']
+        l = ['do']
         for part in [self.endlabel, self.loopcontrol]:
             if part:
                 l.append(str(part))
@@ -1072,7 +1073,7 @@ class Associate(BeginStatement):
         return BeginStatement.process_item(self)
 
     def tostr(self):
-        return 'ASSOCIATE (%s)' % (self.associations)
+        return 'associate (%s)' % (self.associations)
 
     def get_classes(self):
         return execution_part_construct
@@ -1102,7 +1103,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
                         component_names=[],  # specifies component order for sequence types
                         components={}
                         )
-    known_attributes = re.compile(r'\A(PUBLIC|PRIVATE|SEQUENCE|ABSTRACT|BIND\s*\(.*\))\Z', re.I).match
+    known_attributes = re.compile(r'\A(public|private|sequence|abstract|bind\s*\(.*\))\Z', re.I).match
 
     def process_item(self):
         line = self.item.get_line()[4:].lstrip()
@@ -1132,7 +1133,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
         return BeginStatement.process_item(self)
 
     def tostr(self):
-        s = 'TYPE'
+        s = 'type'
         if self.specs:
             s += ', '.join([''] + self.specs) + ' ::'
         s += ' ' + self.name
@@ -1199,9 +1200,9 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
         return
 
     def topyf(self, tab=''):
-        s = tab + 'TYPE'
+        s = tab + 'type'
         if self.a.extends is not None:
-            s += ', EXTENDS(%s) ::' % (self.a.extends)
+            s += ', extends(%s) ::' % (self.a.extends)
         s += ' ' + self.name
         if self.a.parameters:
             s += ' (%s)' % (', '.join(self.a.parameters))
@@ -1209,7 +1210,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
         s += AccessSpecs.topyf(self, tab=tab + '  ')
         s += HasAttributes.topyf(self, tab=tab + '  ')
         s += HasVariables.topyf(self, tab=tab + '  ')
-        s += tab + 'END TYPE ' + self.name + '\n'
+        s += tab + 'end type ' + self.name + '\n'
         return s
 
     # Wrapper methods:
@@ -1227,9 +1228,9 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
     def is_public(self): return not self.is_private()
 
     def is_private(self):
-        if 'PUBLIC' in self.a.attributes:
+        if 'public' in self.a.attributes:
             return False
-        if 'PRIVATE' in self.a.attributes:
+        if 'private' in self.a.attributes:
             return True
         return self.parent.check_private(self.name)
 

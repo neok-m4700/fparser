@@ -242,7 +242,8 @@ class Line(object):
                     substrings.append(')')
                     line = ''.join(substrings)
 
-        line, str_map = string_replace_map(line, lower=not self.reader.ispyf)
+        # line, str_map = string_replace_map(line, lower=not self.reader.ispyf)
+        line, str_map = string_replace_map(line, lower=False)
         self.strline = line
         self.strlinemap = str_map
         return line

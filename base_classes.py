@@ -245,10 +245,10 @@ class Variable(object):
                 self.intent.append(i)
         return
 
-    known_attributes = ['PUBLIC', 'PRIVATE', 'ALLOCATABLE', 'ASYNCHRONOUS',
-                        'EXTERNAL', 'INTRINSIC', 'OPTIONAL', 'PARAMETER',
-                        'POINTER', 'PROTECTED', 'SAVE', 'TARGET', 'VALUE',
-                        'VOLATILE', 'REQUIRED']
+    known_attributes = ['public', 'private', 'allocatable', 'asynchronous',
+                        'external', 'intrinsic', 'optional', 'parameter',
+                        'pointer', 'protected', 'save', 'target', 'value',
+                        'volatile', 'required']
 
     def is_intent_in(self):
         if not self.intent:
@@ -303,27 +303,27 @@ class Variable(object):
     def is_intent_aux(self): return self.intent and 'AUX' in self.intent
 
     def is_private(self):
-        if 'PUBLIC' in self.attributes:
+        if 'public' in self.attributes:
             return False
-        if 'PRIVATE' in self.attributes:
+        if 'private' in self.attributes:
             return True
         return self.parent.parent.check_private(self.name)
 
     def is_public(self): return not self.is_private()
 
-    def is_allocatable(self): return 'ALLOCATABLE' in self.attributes
+    def is_allocatable(self): return 'allocatable' in self.attributes
 
-    def is_external(self): return 'EXTERNAL' in self.attributes
+    def is_external(self): return 'external' in self.attributes
 
-    def is_intrinsic(self): return 'INTRINSIC' in self.attributes
+    def is_intrinsic(self): return 'intrinsic' in self.attributes
 
-    def is_parameter(self): return 'PARAMETER' in self.attributes
+    def is_parameter(self): return 'parameter' in self.attributes
 
-    def is_optional(self): return 'OPTIONAL' in self.attributes and 'REQUIRED' not in self.attributes and not self.is_intent_hide()
+    def is_optional(self): return 'optional' in self.attributes and 'required' not in self.attributes and not self.is_intent_hide()
 
     def is_required(self): return self.is_optional() and not self.is_intent_hide()
 
-    def is_pointer(self): return 'POINTER' in self.attributes
+    def is_pointer(self): return 'pointer' in self.attributes
 
     def is_array(self): return not not (self.bounds or self.dimension)
 
@@ -372,13 +372,13 @@ class Variable(object):
             s += typedecl.tostr() + ' '
         a = self.attributes[:]
         if self.dimension is not None:
-            a.append('DIMENSION(%s)' % (', '.join([':'.join(spec) for spec in self.dimension])))
+            a.append('dimension(%s)' % (', '.join([':'.join(spec) for spec in self.dimension])))
         if self.intent is not None:
-            a.append('INTENT(%s)' % (', '.join(self.intent)))
+            a.append('intent(%s)' % (', '.join(self.intent)))
         if self.bind:
-            a.append('BIND(%s)' % (', '.join(self.bind)))
+            a.append('bind(%s)' % (', '.join(self.bind)))
         if self.check:
-            a.append('CHECK(%s)' % (', '.join(self.check)))
+            a.append('check(%s)' % (', '.join(self.check)))
         if a:
             s += ', ' + ', '.join(a) + ' :: '
         s += self.name
@@ -691,7 +691,8 @@ class BeginStatement(Statement):
         return
 
     def tostr(self):
-        return self.blocktype.upper() + ' ' + self.name
+        # return self.blocktype.upper() + ' ' + self.name
+        return self.blocktype + ' ' + self.name
 
     def tofortran(self, isfix=None):
         construct_name = self.construct_name
@@ -901,9 +902,7 @@ class EndStatement(Statement):
             # different case and therefore cast both to the same case in our
             # equivalence test.
             if line.lower() != name.lower():
-                self.warning(
-                    'expected the end of %r block but got the end of %r, skipping.'
-                    % (name, line))
+                self.warning('expected the end of %r block but got the end of %r, skipping.' % (name, line))
                 self.isvalid = False
         self.name = name
 
@@ -914,5 +913,5 @@ class EndStatement(Statement):
         return Statement.get_indent_tab(self, deindent=True, isfix=isfix)
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'END %s %s'\
-            % (self.blocktype.upper(), self.name or '')
+        # return self.get_indent_tab(isfix=isfix) + 'end %s %s' % (self.blocktype.upper(), self.name or '')
+        return self.get_indent_tab(isfix=isfix) + 'end %s %s' % (self.blocktype, self.name or '')

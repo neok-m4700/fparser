@@ -250,16 +250,17 @@ class TypeDeclarationStatement(Statement):
         return l, kind
 
     def tostr(self):
-        clsname = self.__class__.__name__.upper()
+        # clsname = self.__class__.__name__.upper()
+        clsname = self.__class__.__name__.lower()
         s = ''
         length, kind = self.selector
         if isinstance(self, Character):
             if length and kind:
-                s += '(LEN=%s, KIND=%s)' % (length, kind)
+                s += '(len=%s, kind=%s)' % (length, kind)
             elif length:
-                s += '(LEN=%s)' % (length)
+                s += '(len=%s)' % (length)
             elif kind:
-                s += '(KIND=%s)' % (kind)
+                s += '(kind=%s)' % (kind)
         else:
             if isinstance(self, Type):
                 s += '(%s)' % (kind)
@@ -267,7 +268,7 @@ class TypeDeclarationStatement(Statement):
                 if length:
                     s += '*%s' % (length)
                 if kind:
-                    s += '(KIND=%s)' % (kind)
+                    s += '(kind=%s)' % (kind)
 
         return clsname + s
 
@@ -275,7 +276,8 @@ class TypeDeclarationStatement(Statement):
         tab = self.get_indent_tab(isfix=isfix)
         s = self.tostr()
         if self.attrspec:
-            s += ', ' + ', '.join(self.attrspec)
+            # s += ', ' + ', '.join(self.attrspec)
+            s += ', ' + ', '.join(self.attrspec).lower()  # DIMENSION, PRIVATE => .lower()
         if self.attrspec or '=' in str(self.entity_decls):
             s += ' ::'
         if self.entity_decls:
@@ -558,7 +560,7 @@ class Implicit(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if not self.items:
-            return tab + 'IMPLICIT NONE'
+            return tab + 'implicit none'
         l = []
         for stmt, specs in self.items:
             l1 = []
@@ -568,7 +570,7 @@ class Implicit(Statement):
                 else:
                     l1.append(s + '-' + e)
             l.append('%s ( %s )' % (stmt.tostr(), ', '.join(l1)))
-        return tab + 'IMPLICIT ' + ', '.join(l)
+        return tab + 'implicit ' + ', '.join(l)
 
     def analyze(self):
         implicit_rules = self.parent.a.implicit_rules
