@@ -44,10 +44,8 @@ class AttributeHolder(object):
 
     def __getattr__(self, name):
         if name not in self._attributes:
-            raise AttributeError, '%s instance has no attribute %r, '\
-                'expected attributes: %s' \
-                % (self.__class__.__name__, name,
-                   ','.join(self._attributes.keys()))
+            raise AttributeError, '%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name,
+                                                                                                ','.join(self._attributes.keys()))
         value = self._attributes[name]
         if callable(value):
             value = value()
@@ -59,12 +57,9 @@ class AttributeHolder(object):
             self.__dict__[name] = value
             return
         if name in self._readonly:
-            raise AttributeError, '%s instance attribute %r is readonly' \
-                % (self.__class__.__name__, name)
+            raise AttributeError, '%s instance attribute %r is readonly' % (self.__class__.__name__, name)
         if name not in self._attributes:
-            raise AttributeError, '%s instance has no attribute %r, '\
-                'expected attributes: %s' \
-                % (self.__class__.__name__, name, ','.join(self._attributes.keys()))
+            raise AttributeError, '%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name, ','.join(self._attributes.keys()))
         self._attributes[name] = value
 
     def isempty(self):
@@ -124,15 +119,8 @@ class Variable(object):
         self.parent = parent
         self.parents = [parent]
         self.name = name
-        self.typedecl = None
-        self.dimension = None
-        self.bounds = None
-        self.length = None
-        self.attributes = []
-        self.intent = None
-        self.bind = []
-        self.check = []
-        self.init = None
+        self.typedecl, self.dimension, self.bounds, self.length, self.intent, self.init = (None for _ in range(6))
+        self.attributes, self.bind, self.check = ([] for _ in range(3))
 
         # after calling analyze the following additional attributes are set:
         # .is_array:
@@ -184,10 +172,7 @@ class Variable(object):
     def set_type(self, typedecl):
         if self.typedecl is not None:
             if not self.typedecl == typedecl:
-                self.parent.warning(
-                    'variable %r already has type %s,'
-                    ' resetting to %s'
-                    % (self.name, self.typedecl.tostr(), typedecl.tostr()))
+                self.parent.warning('variable %r already has type %s, resetting to %s' % (self.name, self.typedecl.tostr(), typedecl.tostr()))
         assert typedecl is not None
         self.typedecl = typedecl
         return
@@ -195,9 +180,7 @@ class Variable(object):
     def set_init(self, expr):
         if self.init is not None:
             if not self.init == expr:
-                self.parent.warning(
-                    'variable %r already has initialization %r, '
-                    ' resetting to %r' % (self.name, self.expr, expr))
+                self.parent.warning('variable %r already has initialization %r, resetting to %r' % (self.name, self.expr, expr))
         self.init = expr
         return
 
@@ -207,32 +190,25 @@ class Variable(object):
         if self.dimension is not None:
             if not self.dimension == dims:
                 self.parent.warning(
-                    'variable %r already has dimension %r, '
-                    ' resetting to %r' % (self.name, self.dimension, dims))
+                    'variable %r already has dimension %r, resetting to %r' % (self.name, self.dimension, dims))
         self.dimension = dims
         return
 
     def set_bounds(self, bounds):
         if self.bounds is not None:
             if not self.bounds == bounds:
-                self.parent.warning(
-                    'variable %r already has bounds %r, '
-                    ' resetting to %r' % (self.name, self.bounds, bounds))
+                self.parent.warning('variable %r already has bounds %r, resetting to %r' % (self.name, self.bounds, bounds))
         self.bounds = bounds
         return
 
     def set_length(self, length):
         if self.length is not None:
             if not self.length == length:
-                self.parent.warning(
-                    'variable %r already has length %r, '
-                    ' resetting to %r' % (self.name, self.length, length))
+                self.parent.warning('variable %r already has length %r, resetting to %r' % (self.name, self.length, length))
         self.length = length
         return
 
-    known_intent_specs = ['IN', 'OUT', 'INOUT', 'CACHE', 'HIDE', 'COPY',
-                          'OVERWRITE', 'CALLBACK', 'AUX', 'C', 'INPLACE',
-                          'OUT=']
+    known_intent_specs = ['in', 'out', 'inout', 'cache', 'hide', 'copy', 'overwrite', 'callback', 'aux', 'c', 'inplace', 'out=']
 
     def set_intent(self, intent):
         if self.intent is None:
@@ -240,8 +216,7 @@ class Variable(object):
         for i in intent:
             if i not in self.intent:
                 if i not in self.known_intent_specs:
-                    self.parent.warning('unknown intent-spec %r for %r'
-                                        % (i, self.name))
+                    self.parent.warning('unknown intent-spec %r for %r' % (i, self.name))
                 self.intent.append(i)
         return
 
@@ -253,26 +228,26 @@ class Variable(object):
     def is_intent_in(self):
         if not self.intent:
             return True
-        if 'HIDE' in self.intent:
+        if 'hide' in self.intent:
             return False
-        if 'INPLACE' in self.intent:
+        if 'inplace' in self.intent:
             return False
-        if 'IN' in self.intent:
+        if 'in' in self.intent:
             return True
-        if 'OUT' in self.intent:
+        if 'out' in self.intent:
             return False
-        if 'INOUT' in self.intent:
+        if 'inout' in self.intent:
             return False
-        if 'OUTIN' in self.intent:
+        if 'outin' in self.intent:
             return False
         return True
 
     def is_intent_inout(self):
         if not self.intent:
             return False
-        if 'INOUT' in self.intent:
-            if 'IN' in self.intent or 'HIDE' in self.intent or 'INPLACE' in self.intent:
-                self.warning('INOUT ignored in INPUT(%s)' % (', '.join(self.intent)))
+        if 'inout' in self.intent:
+            if 'in' in self.intent or 'hide' in self.intent or 'inplace' in self.intent:
+                self.warning('inout ignored in input(%s)' % (', '.join(self.intent)))
                 return False
             return True
         return False
@@ -280,27 +255,27 @@ class Variable(object):
     def is_intent_hide(self):
         if not self.intent:
             return False
-        if 'HIDE' in self.intent:
+        if 'hide' in self.intent:
             return True
-        if 'OUT' in self.intent:
-            return 'IN' not in self.intent and 'INPLACE' not in self.intent and 'INOUT' not in self.intent
+        if 'out' in self.intent:
+            return 'in' not in self.intent and 'inplace' not in self.intent and 'inout' not in self.intent
         return False
 
-    def is_intent_inplace(self): return self.intent and 'INPLACE' in self.intent
+    def is_intent_inplace(self): return self.intent and 'inplace' in self.intent
 
-    def is_intent_out(self): return self.intent and 'OUT' in self.intent
+    def is_intent_out(self): return self.intent and 'out' in self.intent
 
-    def is_intent_c(self): return self.intent and 'C' in self.intent
+    def is_intent_c(self): return self.intent and 'c' in self.intent
 
-    def is_intent_cache(self): return self.intent and 'CACHE' in self.intent
+    def is_intent_cache(self): return self.intent and 'cache' in self.intent
 
-    def is_intent_copy(self): return self.intent and 'COPY' in self.intent
+    def is_intent_copy(self): return self.intent and 'copy' in self.intent
 
-    def is_intent_overwrite(self): return self.intent and 'OVERWRITE' in self.intent
+    def is_intent_overwrite(self): return self.intent and 'overwrite' in self.intent
 
-    def is_intent_callback(self): return self.intent and 'CALLBACK' in self.intent
+    def is_intent_callback(self): return self.intent and 'callback' in self.intent
 
-    def is_intent_aux(self): return self.intent and 'AUX' in self.intent
+    def is_intent_aux(self): return self.intent and 'aux' in self.intent
 
     def is_private(self):
         if 'public' in self.attributes:
@@ -335,7 +310,8 @@ class Variable(object):
             attrs = attrs[0]
         for attr in attrs:
             lattr = attr.lower()
-            uattr = attr.upper()
+            # uattr = attr.upper()
+            uattr = attr
             if lattr.startswith('dimension'):
                 assert self.dimension is None, `self.dimension, attr`
                 l = attr[9:].lstrip()
@@ -345,14 +321,12 @@ class Variable(object):
             if lattr.startswith('intent'):
                 l = attr[6:].lstrip()
                 assert l[0] + l[-1] == '()', `l`
-                self.set_intent(specs_split_comma(l[1:-1].strip(),
-                                                  self.parent.item, upper=True))
+                self.set_intent(specs_split_comma(l[1:-1].strip(), self.parent.item))
                 continue
             if lattr.startswith('bind'):
                 l = attr[4:].lstrip()
                 assert l[0] + l[-1] == '()', `l`
-                self.bind = specs_split_comma(l[1:-1].strip(), self.parent.item,
-                                              upper=True)
+                self.bind = specs_split_comma(l[1:-1].strip(), self.parent.item)
                 continue
             if lattr.startswith('check'):
                 l = attr[5:].lstrip()
@@ -503,7 +477,7 @@ class Statement(object):
         elif hasattr(parent, 'programblock'):
             self.programblock = parent.programblock
         else:
-            #self.warning('%s.programblock attribute not set.' % (self.__class__.__name__))
+            # self.warning('%s.programblock attribute not set.' % (self.__class__.__name__))
             pass
 
         # when a statement instance is constructed by error, set isvalid to False

@@ -209,10 +209,7 @@ class BeginSource(BeginStatement):
     """
     match = staticmethod(lambda s: True)
     end_stmt_cls = EndSource
-    a = AttributeHolder(module={},
-                        external_subprogram={},
-                        blockdata={},
-                        )
+    a = AttributeHolder(module={}, external_subprogram={}, blockdata={})
 
     def tofortran(self, isfix=None):
         if isfix:

@@ -261,7 +261,7 @@ class Line(object):
     def parse_block(self, reader, cls, parent_cls):
         key = cls, tuple(parent_cls)
         if not self.parse_cache.has_key(key):
-            #self.parse_cache[key] = None
+            # self.parse_cache[key] = None
             obj = cls(reader, parent_cls=parent_cls)
             self.parse_cache[key] = obj
         else:
