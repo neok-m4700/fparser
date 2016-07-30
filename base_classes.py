@@ -20,6 +20,7 @@ from readfortran import Line, Comment
 from numpy.distutils.misc_util import yellow_text, red_text
 from utils import split_comma, specs_split_comma, is_int_literal_constant
 from utils import classes
+import block_statements
 
 logger = logging.getLogger('fparser')
 
@@ -535,7 +536,7 @@ class Statement(object):
         else:
             tab = ''
         p = self.parent
-        while isinstance(p, Statement):
+        while isinstance(p, Statement) and not isinstance(p, block_statements.BeginSource):
             tab += '  '
             p = p.parent
         if deindent:

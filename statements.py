@@ -294,8 +294,7 @@ class AssignedGoto(Statement):
     def tofortran(self, isfix=None):
         tab = self.get_indent_tab(isfix=isfix)
         if self.items:
-            return tab + 'go to %s (%s)' \
-                % (self.varname, ', '.join(self.items))
+            return tab + 'go to %s (%s)' % (self.varname, ', '.join(self.items))
         return tab + 'go to %s' % (self.varname)
 
     def analyze(self): return
@@ -1805,8 +1804,7 @@ class Bind(Statement):
         return
 
     def tofortran(self, isfix=None):
-        return self.get_indent_tab(isfix=isfix) + 'bind (%s) %s' %\
-            (', '.join(self.specs), ', '.join(self.items))
+        return self.get_indent_tab(isfix=isfix) + 'bind (%s) %s' % (', '.join(self.specs), ', '.join(self.items))
 
 # IF construct statements
 

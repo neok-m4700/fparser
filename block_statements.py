@@ -22,8 +22,7 @@ import re
 import sys
 import logging
 
-from base_classes import BeginStatement, EndStatement, Statement,\
-    AttributeHolder, ProgramBlock, Variable
+from base_classes import BeginStatement, EndStatement, Statement, AttributeHolder, ProgramBlock, Variable
 from readfortran import Line
 from utils import split_comma, filter_stmts, parse_bind, parse_result, AnalyzeError, is_name
 
@@ -255,10 +254,7 @@ class BeginSource(BeginStatement):
         if self.reader.isf77:
             line = item.get_line()
             if line == 'end':
-                message = item.reader.format_message(
-                    'WARNING',
-                    'assuming the end of undefined PROGRAM statement',
-                    item.span[0], item.span[1])
+                message = item.reader.format_message('WARNING', 'assuming the end of undefined PROGRAM statement', item.span[0], item.span[1])
                 logger.warning(message)
                 # print >> sys.stderr, message
                 p = Program(self)
