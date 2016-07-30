@@ -74,7 +74,7 @@ def get_reader(input, isfree=None, isstrict=None, include_dirs=None, source_only
     elif isinstance(input, str):
         reader = FortranStringReader(input, include_dirs=include_dirs, source_only=source_only)
     else:
-        raise TypeError, 'Expected string or filename input but got %s' % (type(input))
+        raise TypeError('Expected string or filename input but got %s' % (type(input)))
     if isfree is None:
         isfree = reader.isfree
     if isstrict is None:

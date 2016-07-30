@@ -766,9 +766,7 @@ class BeginStatement(Statement):
             if i != -1:
                 message = item.reader.format_message(
                     'WARNING',
-                    'no parse pattern found for "%s" in %r block,'
-                    ' trying to remove inline comment (not in Fortran 77).'
-                    % (item.get_line(), self.__class__.__name__),
+                    'no parse pattern found for "%s" in %r block, trying to remove inline comment (not in Fortran 77).' % (item.get_line(), self.__class__.__name__),
                     item.span[0], item.span[1])
                 # .. but at the expense of loosing the comment.
                 logger.warning(message)
@@ -788,10 +786,7 @@ class BeginStatement(Statement):
             if classes:
                 message = item.reader.format_message(
                     'WARNING',
-                    'no parse pattern found for "%s" in %r block'
-                    ' maybe due to strict f77 mode.'
-                    ' Trying f90 fix mode patterns..'
-                    % (item.get_line(), self.__class__.__name__),
+                    'no parse pattern found for "%s" in %r block maybe due to strict f77 mode. Trying f90 fix mode patterns..' % (item.get_line(), self.__class__.__name__),
                     item.span[0], item.span[1])
                 logger.warning(message)
                 # self.show_message(message)
@@ -807,8 +802,7 @@ class BeginStatement(Statement):
                 else:
                     message = item.reader.format_message(
                         'INFORMATION',
-                        'The f90 fix mode resolved the parse pattern issue.'
-                        ' Setting reader to f90 fix mode.',
+                        'The f90 fix mode resolved the parse pattern issue. Setting reader to f90 fix mode.',
                         item.span[0], item.span[1])
                     logger.info(message)
                     # self.show_message(message)

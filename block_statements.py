@@ -393,8 +393,7 @@ class PythonModule(BeginStatement, HasImplicitStmt, HasUseStmt,
         return [Interface, Function, Subroutine, Module]
 
     def process_item(self):
-        self.name = self.item.get_line().replace(' ', '')\
-            [len(self.blocktype):].strip()
+        self.name = self.item.get_line().replace(' ', '')[len(self.blocktype):].strip()
         return BeginStatement.process_item(self)
 
 # Program
@@ -567,14 +566,14 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         line = item.get_line()
         m = self.match(line)
         i = line.lower().find(clsname)
-        assert i != -1, `clsname, line`
+        assert i != -1, repr(clsname, line)
         self.prefix = line[:i].rstrip()
         self.name = line[i:m.end()].lstrip()[len(clsname):].strip()
         line = line[m.end():].lstrip()
         args = []
         if line.startswith('('):
             i = line.find(')')
-            assert i != -1, `line`
+            assert i != -1, repr(line)
             line2 = item.apply_map(line[:i + 1])
             for a in line2[1:-1].split(','):
                 a = a.strip()
@@ -588,11 +587,11 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         if isinstance(self, Function):
             self.result, suffix = parse_result(suffix, item)
             if suffix:
-                assert self.bind is None, `self.bind`
+                assert self.bind is None, repr(self.bind)
                 self.bind, suffix = parse_result(suffix, item)
             if self.result is None:
                 self.result = self.name
-        assert not suffix, `suffix`
+        assert not suffix, repr(suffix)
         self.args = args
         self.typedecl = None
         return BeginStatement.process_item(self)
@@ -604,7 +603,7 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         if self.prefix:
             s += self.prefix + ' '
         if self.typedecl is not None:
-            assert isinstance(self, Function), `self.__class__.__name__`
+            assert isinstance(self, Function), repr(self.__class__.__name__)
             s += self.typedecl.tostr() + ' '
         s += clsname
         suf = ''
@@ -615,8 +614,7 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         return '%s %s(%s)%s' % (s, self.name, ', '.join(self.args), suf)
 
     def get_classes(self):
-        return f2py_stmt + specification_part + execution_part \
-            + internal_subprogram_part
+        return f2py_stmt + specification_part + execution_part + internal_subprogram_part
 
     def analyze(self):
         content = self.content[:]
@@ -648,7 +646,7 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
                 stmt = content.pop(0)
                 while isinstance(stmt, Comment):
                     stmt = content.pop(0)
-                assert isinstance(stmt, self.end_stmt_cls), `stmt`
+                assert isinstance(stmt, self.end_stmt_cls), repr(stmt)
             elif isinstance(stmt, self.end_stmt_cls):
                 continue
             else:
@@ -682,15 +680,20 @@ class SubProgramStatement(BeginStatement, ProgramBlock,
         s += tab + 'end ' + self.__class__.__name__ + ' ' + self.name + '\n'
         return s
 
-    def is_public(self): return not self.is_private()
+    def is_public(self):
+        return not self.is_private()
 
-    def is_private(self): return self.parent.check_private(self.name)
+    def is_private(self):
+        return self.parent.check_private(self.name)
 
-    def is_recursive(self): return 'recursive' in self.a.attributes
+    def is_recursive(self):
+        return 'recursive' in self.a.attributes
 
-    def is_pure(self): return 'pure' in self.a.attributes
+    def is_pure(self):
+        return 'pure' in self.a.attributes
 
-    def is_elemental(self): return 'elemental' in self.a.attributes
+    def is_elemental(self):
+        return 'elemental' in self.a.attributes
 
 
 class EndSubroutine(EndStatement):
@@ -926,7 +929,7 @@ class IfThen(BeginStatement):
     def process_item(self):
         item = self.item
         line = item.get_line()[2:-4].strip()
-        assert line[0] == '(' and line[-1] == ')', `line`
+        assert line[0] == '(' and line[-1] == ')', repr(line)
         self.expr = item.apply_map(line[1:-1].strip())
         self.construct_name = item.name
         return BeginStatement.process_item(self)
@@ -974,7 +977,7 @@ class If(BeginStatement):
         return
 
     def tostr(self):
-        assert len(self.content) == 1, `self.content`
+        assert len(self.content) == 1, repr(self.content)
         return 'if (%s) %s' % (self.expr, str(self.content[0]).lstrip())
 
     def tofortran(self, isfix=None):
@@ -1115,7 +1118,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
         i = line.find('(')
         if i != -1:
             self.name = line[:i].rstrip()
-            assert line[-1] == ')', `line`
+            assert line[-1] == ')', repr(line)
             self.params = split_comma(line[i + 1:-1].lstrip())
         else:
             self.name = line
@@ -1142,7 +1145,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
         for spec in self.specs:
             i = spec.find('(')
             if i != -1:
-                assert spec.endswith(')'), `spec`
+                assert spec.endswith(')'), repr(spec)
                 s = spec[:i].rstrip().upper()
                 n = spec[i + 1:-1].strip()
                 if s == 'EXTENDS':
@@ -1150,7 +1153,7 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
                     continue
                 elif s == 'BIND':
                     args, rest = parse_bind(spec)
-                    assert not rest, `rest`
+                    assert not rest, repr(rest)
                     spec = 'BIND(%s)' % (', '.join(args))
                 else:
                     spec = '%s(%s)' % (s, n)
@@ -1218,7 +1221,8 @@ class Type(BeginStatement, HasVariables, HasAttributes, AccessSpecs):
             _cache[id(self)] = s
         return s
 
-    def is_public(self): return not self.is_private()
+    def is_public(self):
+        return not self.is_private()
 
     def is_private(self):
         if 'public' in self.a.attributes:
@@ -1309,16 +1313,14 @@ action_stmt = [Allocate, GeneralAssignment, Assign, Backspace, Call, Close,
 # GeneralAssignment = Assignment + PointerAssignment
 # EndFunction, EndProgram, EndSubroutine - part of the corresponding blocks
 
-executable_construct = [Associate, Do, ForallConstruct, IfThen,
-                        Select, WhereConstruct] + action_stmt
+executable_construct = [Associate, Do, ForallConstruct, IfThen, Select, WhereConstruct] + action_stmt
 # Case, see Select
 
-execution_part_construct = executable_construct + [Format, Entry,
-                                                   Data]
+execution_part_construct = executable_construct + [Format, Entry, Data]
 
 execution_part = execution_part_construct[:]
 
-#C201, R208
+# C201, R208
 for cls in [EndFunction, EndProgram, EndSubroutine]:
     try:
         execution_part.remove(cls)
@@ -1330,20 +1332,16 @@ internal_subprogram = [Function, Subroutine]
 internal_subprogram_part = [Contains, ] + internal_subprogram
 
 declaration_construct = [TypeDecl, Entry, Enum, Format, Interface,
-                         Parameter, ModuleProcedure, ] + specification_stmt + \
-    type_declaration_stmt
+                         Parameter, ModuleProcedure, ] + specification_stmt + type_declaration_stmt
 # stmt-function-stmt
 
 implicit_part = [Implicit, Parameter, Format, Entry]
 
-specification_part = [ Use, Import ] + implicit_part + \
-    declaration_construct
+specification_part = [Use, Import] + implicit_part + declaration_construct
 
 
 external_subprogram = [Function, Subroutine]
 
-main_program = [Program] + specification_part + execution_part + \
-    internal_subprogram_part
+main_program = [Program] + specification_part + execution_part + internal_subprogram_part
 
-program_unit = main_program + external_subprogram + [Module,
-                                                     BlockData]
+program_unit = main_program + external_subprogram + [Module, BlockData]

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 """Provides Fortran reader classes.
 
 Overview
@@ -157,10 +158,10 @@ class Line(object):
 
     def __init__(self, line, linenospan, label, name, reader):
         self.line = line.strip()
-        assert self.line, `line, linenospan, label`
+        assert self.line, repr(line, linenospan, label)
         self.span = linenospan
-        assert label is None or isinstance(label, int), `label`
-        assert name is None or isinstance(name, str) and name != '', `name`
+        assert label is None or isinstance(label, int), repr(label)
+        assert name is None or isinstance(name, str) and name != '', repr(name)
         self.label = label
         self.name = name
         self.reader = reader
@@ -203,7 +204,7 @@ class Line(object):
             s += ' %s ' % (self.label)
         if self.name is not None:
             s += '%s: ' % (self.name)
-        return s + `self.line`
+        return s + repr(self.line)
 
     def isempty(self, ignore_comments=False):
         return not (self.line or self.label is not None or self.name is not None)
@@ -466,7 +467,7 @@ class FortranReaderBase(object):
         elif mode == 'pyf':
             isfree, isstrict = True, True
         else:
-            raise NotImplementedError(`mode`)
+            raise NotImplementedError(repr(mode))
         self.set_mode(isfree, isstrict)
 
     def close_source(self):
@@ -840,7 +841,7 @@ class FortranReaderBase(object):
         if m:
             newline = m.group('indent') + 5 * ' ' + m.group('rest')
             self.f2py_comment_lines.append(self.linecount)
-            assert len(newline) == len(line), `newlinel, line`
+            assert len(newline) == len(line), repr(newlinel, line)
             return newline
         return line
 
@@ -1138,7 +1139,7 @@ class FortranReaderBase(object):
                     # first line, check for a label
                     m = _label_re.match(line)
                     if m:
-                        assert not label, `label`
+                        assert not label, repr(label)
                         label = int(m.group('label'))
                         line = line[m.end():]
                     # check for a construct name
@@ -1247,9 +1248,9 @@ cf2py call me ! hey
       end
      '"""
     reader = FortranStringReader(string_f77)
-    assert reader.mode == 'fix77', `reader.mode`
+    assert reader.mode == 'fix77', repr(reader.mode)
     for item in reader:
-        print item
+        print( item)
 
     filename = tempfile.mktemp() + '.f'
     f = open(filename, 'w')
@@ -1258,7 +1259,7 @@ cf2py call me ! hey
 
     reader = FortranFileReader(filename)
     for item in reader:
-        print item
+        print( item)
 
 
 def test_pyf():
@@ -1290,9 +1291,9 @@ end python module foo
 ! end of file
 """
     reader = FortranStringReader(string_pyf)
-    assert reader.mode == 'pyf', `reader.mode`
+    assert reader.mode == 'pyf', repr(reader.mode)
     for item in reader:
-        print item
+        print( item)
 
 
 def test_fix90():
@@ -1316,17 +1317,17 @@ cComment
       end
 """
     reader = FortranStringReader(string_fix90)
-    assert reader.mode == 'fix90', `reader.mode`
+    assert reader.mode == 'fix90', repr(reader.mode)
     for item in reader:
-        print item
+        print( item)
 
 
 def simple_main():
     for filename in sys.argv[1:]:
-        print 'Processing', filename
+        print( 'Processing', filename)
         reader = FortranFileReader(filename)
         for item in reader:
-            print >> sys.stdout, item
+            print(item, file=sys.stdout)
             sys.stdout.flush()
             pass
 
