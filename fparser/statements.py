@@ -23,7 +23,7 @@ __all__ = ['GeneralAssignment',
            'FinalBinding', 'Allocatable', 'Asynchronous', 'Bind', 'Else', 'ElseIf',
            'Case', 'WhereStmt', 'ElseWhere', 'Enumerator', 'FortranName', 'Threadsafe',
            'Depend', 'Check', 'CallStatement', 'CallProtoArgument', 'Pause',
-           'Comment', 'PreProcessor']
+           'Comment', 'PreProcessor','ExternalFunc']
 
 # !! block_statements.py => fill R214, action_stmt !!
 
@@ -297,7 +297,8 @@ class AssignedGoto(Statement):
             return tab + 'go to %s (%s)' % (self.varname, ', '.join(self.items))
         return tab + 'go to %s' % (self.varname)
 
-    def analyze(self): return
+    def analyze(self):
+        return
 
 
 class Continue(Statement):
@@ -313,7 +314,24 @@ class Continue(Statement):
     def tofortran(self, isfix=None):
         return self.get_indent_tab(deindent=True) + 'continue'
 
-    def analyze(self): return
+    def analyze(self):
+        return
+
+
+class ExternalFunc(Statement):
+    """
+    other function calls UPPER CASE ONLY WITH UNDERSCORE e.g. CHKERRQ in PETSc
+    """
+    match = re.compile(r'[A-Z\d_]+\(.+\)').match
+
+    def process_item(self):
+        return
+
+    def tofortran(self, isfix=None):
+        return self.get_indent_tab(isfix=isfix) + self.item.get_line().lstrip()
+
+    def analyze(self):
+        return
 
 
 class Return(Statement):
@@ -332,7 +350,8 @@ class Return(Statement):
             return tab + 'return %s' % (self.expr)
         return tab + 'return'
 
-    def analyze(self): return
+    def analyze(self):
+        return
 
 
 class Stop(Statement):
@@ -456,6 +475,7 @@ class Write(Statement):
         i = line.find(')')
         assert i != -1, repr(line)
         self.specs = specs_split_comma(line[1:i], item)
+        logging.info(str(self.specs))
         self.items = split_comma(line[i + 1:], item)
         return
 

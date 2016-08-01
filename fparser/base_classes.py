@@ -45,8 +45,9 @@ class AttributeHolder(object):
 
     def __getattr__(self, name):
         if name not in self._attributes:
-            raise AttributeError, '%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name,
-                                                                                                ','.join(self._attributes.keys()))
+            raise AttributeError('%s instance has no attribute %r, expected attributes: %s'
+                                 % (self.__class__.__name__, name,
+                                    ','.join(self._attributes.keys())))
         value = self._attributes[name]
         if callable(value):
             value = value()
@@ -58,9 +59,9 @@ class AttributeHolder(object):
             self.__dict__[name] = value
             return
         if name in self._readonly:
-            raise AttributeError, '%s instance attribute %r is readonly' % (self.__class__.__name__, name)
+            raise AttributeError('%s instance attribute %r is readonly' % (self.__class__.__name__, name))
         if name not in self._attributes:
-            raise AttributeError, '%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name, ','.join(self._attributes.keys()))
+            raise AttributeError('%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name, ','.join(self._attributes.keys())))
         self._attributes[name] = value
 
     def isempty(self):
@@ -70,7 +71,8 @@ class AttributeHolder(object):
                 return False
         return True
 
-    def __repr__(self): return self.torepr()
+    def __repr__(self):
+        return self.torepr()
 
     def torepr(self, depth=-1, tab=''):
         if depth == 0:
@@ -262,21 +264,29 @@ class Variable(object):
             return 'in' not in self.intent and 'inplace' not in self.intent and 'inout' not in self.intent
         return False
 
-    def is_intent_inplace(self): return self.intent and 'inplace' in self.intent
+    def is_intent_inplace(self):
+        return self.intent and 'inplace' in self.intent
 
-    def is_intent_out(self): return self.intent and 'out' in self.intent
+    def is_intent_out(self):
+        return self.intent and 'out' in self.intent
 
-    def is_intent_c(self): return self.intent and 'c' in self.intent
+    def is_intent_c(self):
+        return self.intent and 'c' in self.intent
 
-    def is_intent_cache(self): return self.intent and 'cache' in self.intent
+    def is_intent_cache(self):
+        return self.intent and 'cache' in self.intent
 
-    def is_intent_copy(self): return self.intent and 'copy' in self.intent
+    def is_intent_copy(self):
+        return self.intent and 'copy' in self.intent
 
-    def is_intent_overwrite(self): return self.intent and 'overwrite' in self.intent
+    def is_intent_overwrite(self):
+        return self.intent and 'overwrite' in self.intent
 
-    def is_intent_callback(self): return self.intent and 'callback' in self.intent
+    def is_intent_callback(self):
+        return self.intent and 'callback' in self.intent
 
-    def is_intent_aux(self): return self.intent and 'aux' in self.intent
+    def is_intent_aux(self):
+        return self.intent and 'aux' in self.intent
 
     def is_private(self):
         if 'public' in self.attributes:
@@ -285,25 +295,35 @@ class Variable(object):
             return True
         return self.parent.parent.check_private(self.name)
 
-    def is_public(self): return not self.is_private()
+    def is_public(self):
+        return not self.is_private()
 
-    def is_allocatable(self): return 'allocatable' in self.attributes
+    def is_allocatable(self):
+        return 'allocatable' in self.attributes
 
-    def is_external(self): return 'external' in self.attributes
+    def is_external(self):
+        return 'external' in self.attributes
 
-    def is_intrinsic(self): return 'intrinsic' in self.attributes
+    def is_intrinsic(self):
+        return 'intrinsic' in self.attributes
 
-    def is_parameter(self): return 'parameter' in self.attributes
+    def is_parameter(self):
+        return 'parameter' in self.attributes
 
-    def is_optional(self): return 'optional' in self.attributes and 'required' not in self.attributes and not self.is_intent_hide()
+    def is_optional(self):
+        return 'optional' in self.attributes and 'required' not in self.attributes and not self.is_intent_hide()
 
-    def is_required(self): return self.is_optional() and not self.is_intent_hide()
+    def is_required(self):
+        return self.is_optional() and not self.is_intent_hide()
 
-    def is_pointer(self): return 'pointer' in self.attributes
+    def is_pointer(self):
+        return 'pointer' in self.attributes
 
-    def is_array(self): return not not (self.bounds or self.dimension)
+    def is_array(self):
+        return not not (self.bounds or self.dimension)
 
-    def is_scalar(self): return not self.is_array()
+    def is_scalar(self):
+        return not self.is_array()
 
     def update(self, *attrs):
         attributes = self.attributes
@@ -314,24 +334,24 @@ class Variable(object):
             # uattr = attr.upper()
             uattr = attr
             if lattr.startswith('dimension'):
-                assert self.dimension is None, `self.dimension, attr`
+                assert self.dimension is None, repr(self.dimension, attr)
                 l = attr[9:].lstrip()
-                assert l[0] + l[-1] == '()', `l`
+                assert l[0] + l[-1] == '()', repr(l)
                 self.set_dimension(split_comma(l[1:-1].strip(), self.parent.item))
                 continue
             if lattr.startswith('intent'):
                 l = attr[6:].lstrip()
-                assert l[0] + l[-1] == '()', `l`
+                assert l[0] + l[-1] == '()', repr(l)
                 self.set_intent(specs_split_comma(l[1:-1].strip(), self.parent.item))
                 continue
             if lattr.startswith('bind'):
                 l = attr[4:].lstrip()
-                assert l[0] + l[-1] == '()', `l`
+                assert l[0] + l[-1] == '()', repr(l)
                 self.bind = specs_split_comma(l[1:-1].strip(), self.parent.item)
                 continue
             if lattr.startswith('check'):
                 l = attr[5:].lstrip()
-                assert l[0] + l[-1] == '()', `l`
+                assert l[0] + l[-1] == '()', repr(l)
                 self.check.extend(split_comma(l[1:-1].strip(), self.parent.item))
                 continue
             if uattr not in attributes:
@@ -720,7 +740,7 @@ class BeginStatement(Statement):
                 # TODO: FIX ME, Comment content is a string
                 self.content.append(classes.Comment(self, item))
             else:
-                raise NotImplementedError(`item`)
+                raise NotImplementedError(repr(item))
             item = self.get_item()
 
         if not end_flag:

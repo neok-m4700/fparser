@@ -72,7 +72,7 @@ def specs_split_comma(line, item=None, upper=False):
     for spec in specs0:
         i = spec.find('=')
         if i != -1:
-            kw = spec[:i].strip().upper()
+            kw = spec[:i].strip().lower()  # .upper()
             v = spec[i + 1:].strip()
             specs.append('%s = %s' % (kw, v))
         else:
@@ -142,7 +142,7 @@ def get_module_files(directory, _cache={}):
         for name in module_line.findall(f.read()):
             name = name[1]
             if name in d:
-                print( d[name], 'already defines', name)
+                print(d[name], 'already defines', name)
                 continue
             d[name] = fn
     _cache[directory] = d

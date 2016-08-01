@@ -1018,7 +1018,7 @@ class Do(BeginStatement):
 
     def process_item(self):
         item = self.item
-        line = item.get_line()
+        line = item.get_line(apply_map=True)
         m = self.item_re(line)
         label = m.group('label').strip() or None
         if label:
@@ -1309,7 +1309,7 @@ action_stmt = [Allocate, GeneralAssignment, Assign, Backspace, Call, Close,
                Continue, Cycle, Deallocate, Endfile, Exit, Flush, ForallStmt,
                Goto, If, Inquire, Nullify, Open, Print, Read, Return, Rewind,
                Stop, Wait, WhereStmt, Write, ArithmeticIf, ComputedGoto,
-               AssignedGoto, Pause, PreProcessor]
+               AssignedGoto, Pause, PreProcessor, ExternalFunc]
 # GeneralAssignment = Assignment + PointerAssignment
 # EndFunction, EndProgram, EndSubroutine - part of the corresponding blocks
 
