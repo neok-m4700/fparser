@@ -17,7 +17,10 @@ __all__ = ['Integer', 'Real', 'DoublePrecision', 'Complex', 'DoubleComplex',
            'Implicit']
 
 import re
-import string
+try:
+    from string import ascii_lowercase as lowercase
+except:
+    from string import lowercase
 from .base_classes import Statement, BeginStatement, EndStatement, AttributeHolder, Variable
 from .utils import split_comma, AnalyzeError, name_re, is_entity_decl, is_name, CHAR_BIT, parse_array_spec
 
@@ -522,7 +525,7 @@ class Implicit(Statement):
     """
     match = re.compile(r'implicit\b', re.I).match
 
-    letters = string.lowercase
+    letters = lowercase
 
     def process_item(self):
         line = self.item.get_line()[8:].lstrip()
@@ -584,8 +587,7 @@ class Implicit(Statement):
             self.parent.a.implicit_rules = implicit_rules = {}
         for stmt, specs in self.items:
             for s, e in specs:
-                for l in string.lowercase[string.lowercase.index(s.lower()):
-                                          string.lowercase.index(e.lower()) + 1]:
+                for l in self.letters[self.letters.index(s.lower()):self.letters.index(e.lower()) + 1]:
                     implicit_rules[l] = stmt
         return
 

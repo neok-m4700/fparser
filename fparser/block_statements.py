@@ -1262,13 +1262,13 @@ class Enum(BeginStatement):
 
 ###################################################
 
-import statements
-import typedecl_statements
+from . import statements
+from . import typedecl_statements
 __all__.extend(statements.__all__)
 __all__.extend(typedecl_statements.__all__)
 
-from statements import *
-from typedecl_statements import *
+from .statements import *
+from .typedecl_statements import *
 
 f2py_stmt = [Threadsafe, FortranName, Depend, Check, CallStatement,
              CallProtoArgument]
