@@ -115,4 +115,4 @@ def test_walk():
     '''
     tree = api.parse(source_str, isfree=True, isstrict=False, ignore_comments=False)
     for stmt, depth in api.walk(tree, 1):
-        print depth, stmt.item
+        print(depth, stmt.item)

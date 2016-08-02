@@ -80,12 +80,16 @@ import sys
 import tempfile
 import traceback
 import logging
-from cStringIO import StringIO
+# from cStringIO import StringIO
+try:
+    from io import StringIO
+except ImportError:
+    from cStringIO import StringIO
 from numpy.distutils.misc_util import yellow_text, red_text, blue_text
 
-from sourceinfo import get_source_info, get_source_info_str
-from splitline import String, string_replace_map, splitquote
-from utils import is_name
+from .sourceinfo import get_source_info, get_source_info_str
+from .splitline import String, string_replace_map, splitquote
+from .utils import is_name
 
 logger = logging.getLogger('fparser')
 

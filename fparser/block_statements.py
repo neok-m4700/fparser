@@ -34,7 +34,7 @@ class HasImplicitStmt(object):
     def get_type_by_name(self, name):
         implicit_rules = self.a.implicit_rules
         if implicit_rules is None:
-            raise AnalyzeError, 'Implicit rules mapping is null while getting %r type' % (name)
+            raise AnalyzeError('Implicit rules mapping is null while getting %r type' % (name))
         l = name[0].lower()
         if l in implicit_rules:
             return implicit_rules[l]
@@ -516,7 +516,7 @@ class Interface(BeginStatement, HasAttributes, HasImplicitStmt, HasUseStmt,
             if isinstance(stmt, self.end_stmt_cls):
                 break
             stmt.analyze()
-            #assert isinstance(stmt, SubProgramStatement),`stmt.__class__.__name__`
+            #assert isinstance(stmt, SubProgramStatement), repr(stmt.__class__.__name__)
         if content:
             logger.info('Not analyzed content: %s' % content)
             # self.show_message('Not analyzed content: %s' % content)
@@ -530,7 +530,7 @@ class Interface(BeginStatement, HasAttributes, HasImplicitStmt, HasUseStmt,
             if self.name in parent_interface:
                 p = parent_interface[self.name]
                 last = p.content.pop()
-                assert isinstance(last, EndInterface), `last.__class__`
+                assert isinstance(last, EndInterface), repr(last.__class__)
                 p.content += self.content
                 p.update_attributes(self.a.attributes)
             else:

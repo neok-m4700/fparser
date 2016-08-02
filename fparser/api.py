@@ -8,13 +8,13 @@ Module content
 
 __autodoc__ = ['get_reader', 'parse', 'walk']
 
-import Fortran2003
+from . import Fortran2003
 # import all Statement classes:
-from base_classes import EndStatement, classes
-from block_statements import *
+from .base_classes import EndStatement, classes
+from .block_statements import *
 
 # CHAR_BIT is used to convert object bit sizes to byte sizes
-from utils import CHAR_BIT
+from .utils import CHAR_BIT
 
 
 def get_reader(input, isfree=None, isstrict=None, include_dirs=None, source_only=None,
