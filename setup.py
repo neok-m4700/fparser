@@ -7,7 +7,8 @@ setup(name='fparser',
       description='Fortran parser',
       # py_modules=['api', 'Fortran2003', 'readfortran', 'parsefortran'],
       # packages=['fparser']
-      packages=find_packages()
+      packages=find_packages(),
+      package_data={'fparser': ['log.config']},
       )
 
 # def configuration(parent_package='', top_path=None):

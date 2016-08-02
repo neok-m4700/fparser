@@ -593,6 +593,6 @@ class Implicit(Statement):
 intrinsic_type_spec = [
     Integer, Real,
     DoublePrecision, Complex, DoubleComplex, Character, Logical, Byte,
-    Mat, Vec, KSP, PC, PetscErrorCode
+    # Mat, Vec, KSP, PC, PetscErrorCode
 ]
 declaration_type_spec = intrinsic_type_spec + [TypeStmt, Class]

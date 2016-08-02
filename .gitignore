@@ -1,4 +1,7 @@
 *~ 
 *.pyc
 *.bak
-/build
+/build/
+/dist/
+*egg-info/
+fparser.log

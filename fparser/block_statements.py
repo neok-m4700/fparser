@@ -23,7 +23,7 @@ import sys
 import logging
 
 from .base_classes import BeginStatement, EndStatement, Statement, AttributeHolder, ProgramBlock, Variable
-from .readfortran import Line
+# from .readfortran import Line
 from .utils import split_comma, filter_stmts, parse_bind, parse_result, AnalyzeError, is_name
 
 
