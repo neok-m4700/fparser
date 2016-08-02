@@ -82,14 +82,14 @@ import traceback
 import logging
 # from cStringIO import StringIO
 try:
-    from io import StringIO
-except ImportError:
     from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 from numpy.distutils.misc_util import yellow_text, red_text, blue_text
 
 from .sourceinfo import get_source_info, get_source_info_str
 from .splitline import String, string_replace_map, splitquote
-from .utils import is_name
+# from .utils import is_name
 
 logger = logging.getLogger('fparser')
 
@@ -1254,7 +1254,7 @@ cf2py call me ! hey
     reader = FortranStringReader(string_f77)
     assert reader.mode == 'fix77', repr(reader.mode)
     for item in reader:
-        print( item)
+        print(item)
 
     filename = tempfile.mktemp() + '.f'
     f = open(filename, 'w')
@@ -1263,7 +1263,7 @@ cf2py call me ! hey
 
     reader = FortranFileReader(filename)
     for item in reader:
-        print( item)
+        print(item)
 
 
 def test_pyf():
@@ -1297,7 +1297,7 @@ end python module foo
     reader = FortranStringReader(string_pyf)
     assert reader.mode == 'pyf', repr(reader.mode)
     for item in reader:
-        print( item)
+        print(item)
 
 
 def test_fix90():
@@ -1323,12 +1323,12 @@ cComment
     reader = FortranStringReader(string_fix90)
     assert reader.mode == 'fix90', repr(reader.mode)
     for item in reader:
-        print( item)
+        print(item)
 
 
 def simple_main():
     for filename in sys.argv[1:]:
-        print( 'Processing', filename)
+        print('Processing', filename)
         reader = FortranFileReader(filename)
         for item in reader:
             print(item, file=sys.stdout)

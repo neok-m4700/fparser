@@ -31,13 +31,11 @@ import re
 import sys
 import logging
 
-from base_classes import Statement, Variable
+from .base_classes import Statement, Variable
 
 # Auxiliary tools
 
-from utils import split_comma, specs_split_comma, AnalyzeError, ParseError,\
-    get_module_file, parse_bind, parse_result, is_name
-from utils import classes
+from .utils import split_comma, specs_split_comma, AnalyzeError, ParseError, get_module_file, parse_bind, parse_result, is_name, classes
 
 
 class StatementWithNamelist(Statement):

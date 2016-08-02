@@ -13,9 +13,9 @@ import traceback
 import logging
 from numpy.distutils.misc_util import yellow_text, red_text
 
-from readfortran import FortranFileReader, FortranStringReader
-from block_statements import BeginSource
-from utils import AnalyzeError
+from .readfortran import FortranFileReader, FortranStringReader
+from .block_statements import BeginSource
+from .utils import AnalyzeError
 
 logger = logging.getLogger('fparser')
 
