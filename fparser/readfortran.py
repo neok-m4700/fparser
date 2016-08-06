@@ -571,7 +571,6 @@ class FortranReaderBase(object):
         try:
             _ = self.ignore_comments
             self.ignore_comments = True
-            # item = self.next(ignore_comments=True)  #  ignore_comments=True
             item = next(self)
             self.ignore_comments = _
         except StopIteration:
@@ -591,7 +590,7 @@ class FortranReaderBase(object):
         """
         return self
 
-    def __next__(self):  #  , ignore_comments=False
+    def __next__(self):  # ignore_comments=False
         """ Return the next Fortran code item.
 
         Include statements are realized.

@@ -495,7 +495,7 @@ class Byte(TypeDeclarationStatement):
 class Others(TypeDeclarationStatement):
     '''other type defined in include files'''
     match = re.compile(r'\w+\b', re.I).match
-    # here import the new types defined in readfortran
+    # here import the new types defined in readfortran ?
 
 
 class Type(TypeDeclarationStatement):

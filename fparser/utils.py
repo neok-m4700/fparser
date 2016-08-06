@@ -184,8 +184,8 @@ def module_in_file(name, filename):
 def str2stmt(string, isfree=True, isstrict=False):
     """ Convert Fortran code to Statement tree.
     """
-    from readfortran import Line, FortranStringReader
-    from parsefortran import FortranParser
+    from .readfortran import Line, FortranStringReader
+    from .parsefortran import FortranParser
     reader = FortranStringReader(string, isfree, isstrict)
     parser = FortranParser(reader)
     parser.parse()
@@ -248,7 +248,7 @@ class meta_classes(type):
         return cls
 
 
-class classes(type):
+class classes(type, metaclass=meta_classes):
     """Make classes available as attributes of this class.
 
     To add a class to the attributes list, one must use::
@@ -261,8 +261,6 @@ class classes(type):
 
     * decorate analyze methods with show_item_on_failure
     """
-
-    __metaclass__ = meta_classes
 
     def __new__(metacls, name, bases, dict):
         if 'analyze' in dict:

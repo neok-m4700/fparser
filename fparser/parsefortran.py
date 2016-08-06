@@ -40,22 +40,19 @@ class FortranParser(object):
             self.block = None
             self.is_analyzed = False
         self.ignore_comments = ignore_comments
-        return
 
     def get_item(self):
         try:
             _ = self.reader.ignore_comments
             self.reader.ignore_comments = self.ignore_comments
-            item = next(self.reader) # .next(ignore_comments=self.ignore_comments)
+            item = next(self.reader)  # .next(ignore_comments=self.ignore_comments)
             self.reader.ignore_comments = _
             return item
         except StopIteration:
             pass
-        return
 
     def put_item(self, item):
         self.reader.fifo_item.insert(0, item)
-        return
 
     def parse(self):
         if self.block is not None:
@@ -79,8 +76,6 @@ class FortranParser(object):
             # traceback.print_exc(file=sys.stderr)
             logger.critical(red_text('STOPPED PARSING'))
             # self.reader.show_message(red_text('STOPPED PARSING'), sys.stderr)
-            return
-        return
 
     def analyze(self):
         if self.is_analyzed:
@@ -104,7 +99,6 @@ class FortranParser(object):
             # sys.exit(123454321)
             # return
         self.is_analyzed = True
-        return
 
 
 def test_pyf():

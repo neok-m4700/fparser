@@ -19,6 +19,8 @@ import logging
 from numpy.distutils.misc_util import yellow_text, red_text
 from .readfortran import Line, Comment
 from .utils import split_comma, specs_split_comma, is_int_literal_constant, classes
+import collections
+from functools import reduce
 # from .block_statements import BeginSource
 
 logger = logging.getLogger('fparser')
@@ -36,9 +38,9 @@ class AttributeHolder(object):
     def __init__(self, **kws):
         self._attributes = {}
         self._readonly = []
-        for k, v in kws.items():
+        for k, v in list(kws.items()):
             self._attributes[k] = v
-            if callable(v):
+            if isinstance(v, collections.Callable):
                 self._readonly.append(k)
         return
 
@@ -46,9 +48,9 @@ class AttributeHolder(object):
         if name not in self._attributes:
             raise AttributeError('%s instance has no attribute %r, expected attributes: %s'
                                  % (self.__class__.__name__, name,
-                                    ','.join(self._attributes.keys())))
+                                    ','.join(list(self._attributes.keys()))))
         value = self._attributes[name]
-        if callable(value):
+        if isinstance(value, collections.Callable):
             value = value()
             self._attributes[name] = value
         return value
@@ -60,11 +62,11 @@ class AttributeHolder(object):
         if name in self._readonly:
             raise AttributeError('%s instance attribute %r is readonly' % (self.__class__.__name__, name))
         if name not in self._attributes:
-            raise AttributeError('%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name, ','.join(self._attributes.keys())))
+            raise AttributeError('%s instance has no attribute %r, expected attributes: %s' % (self.__class__.__name__, name, ','.join(list(self._attributes.keys()))))
         self._attributes[name] = value
 
     def isempty(self):
-        for k in self._attributes.keys():
+        for k in list(self._attributes.keys()):
             v = getattr(self, k)
             if v:
                 return False
@@ -78,20 +80,20 @@ class AttributeHolder(object):
             return tab + self.__class__.__name__
         l = [self.__class__.__name__ + ':']
         ttab = tab + '    '
-        for k in self._attributes.keys():
+        for k in list(self._attributes.keys()):
             v = getattr(self, k)
             if v:
                 if isinstance(v, list):
                     l.append(ttab + '%s=<%s-list>' % (k, len(v)))
                 elif isinstance(v, dict):
-                    l.append(ttab + '%s=<dict with keys %s>' % (k, v.keys()))
+                    l.append(ttab + '%s=<dict with keys %s>' % (k, list(v.keys())))
                 else:
                     l.append(ttab + '%s=<%s>' % (k, type(v)))
         return '\n'.join(l)
 
     def todict(self):
         d = {}
-        for k in self._attributes.keys():
+        for k in list(self._attributes.keys()):
             v = getattr(self, k)
             d[k] = v
         return d
@@ -104,7 +106,7 @@ def get_base_classes(cls):
     return bases + cls.__bases__ + (cls,)
 
 
-class Variable(object):
+class Variable(object, metaclass=classes):
     """
     Variable instance has attributes:
       name
@@ -114,8 +116,6 @@ class Variable(object):
       intent
       parent - Statement instances defining the variable
     """
-
-    __metaclass__ = classes
 
     def __init__(self, parent, name):
         self.parent = parent
@@ -166,7 +166,7 @@ class Variable(object):
         return self.typedecl
 
     def add_parent(self, parent):
-        if id(parent) not in map(id, self.parents):
+        if id(parent) not in list(map(id, self.parents)):
             self.parents.append(parent)
         self.parent = parent
         return
@@ -464,19 +464,18 @@ class Variable(object):
         return self.parent.info(message)
 
 
-class ProgramBlock(object):
+class ProgramBlock(object, metaclass=classes):
 
-    __metaclass__ = classes
+    pass
 
 
-class Statement(object):
+class Statement(object, metaclass=classes):
     """
     Statement instance has attributes:
       parent  - Parent BeginStatement or FortranParser instance
       item    - Line instance containing the statement line
       isvalid - boolean, when False, the Statement instance will be ignored
     """
-    __metaclass__ = classes
 
     modes = ['free', 'fix', 'f77', 'pyf']
     _repr_attr_names = []
