@@ -381,13 +381,17 @@ class TypeDeclarationStatement(Statement):
     def get_bit_size(self):
         return CHAR_BIT * int(self.get_byte_size())
 
-    def is_intrinsic(self): return not isinstance(self, (Type, Class))
+    def is_intrinsic(self):
+        return not isinstance(self, (Type, Class))
 
-    def is_derived(self): return isinstance(self, Type)
+    def is_derived(self):
+        return isinstance(self, Type)
 
-    def is_numeric(self): return isinstance(self, (Integer, Real, DoublePrecision, Complex, DoubleComplex, Byte))
+    def is_numeric(self):
+        return isinstance(self, (Integer, Real, DoublePrecision, Complex, DoubleComplex, Byte))
 
-    def is_nonnumeric(self): return isinstance(self, (Character, Logical))
+    def is_nonnumeric(self):
+        return isinstance(self, (Character, Logical))
 
 
 class Integer(TypeDeclarationStatement):
@@ -487,6 +491,11 @@ class Byte(TypeDeclarationStatement):
 
     def get_zero_value(self):
         return '0'
+
+class Others(TypeDeclarationStatement):
+    '''other type defined in include files'''
+    match = re.compile(r'\w+\b', re.I).match
+    # here import the new types defined in readfortran
 
 
 class Type(TypeDeclarationStatement):
@@ -593,7 +602,6 @@ class Implicit(Statement):
 
 intrinsic_type_spec = [
     Integer, Real,
-    DoublePrecision, Complex, DoubleComplex, Character, Logical, Byte,
-    # Mat, Vec, KSP, PC, PetscErrorCode
+    DoublePrecision, Complex, DoubleComplex, Character, Logical, Byte
 ]
-declaration_type_spec = intrinsic_type_spec + [TypeStmt, Class]
+declaration_type_spec = intrinsic_type_spec + [TypeStmt, Class, Others]

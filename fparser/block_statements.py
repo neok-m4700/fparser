@@ -1309,7 +1309,7 @@ action_stmt = [Allocate, GeneralAssignment, Assign, Backspace, Call, Close,
                Continue, Cycle, Deallocate, Endfile, Exit, Flush, ForallStmt,
                Goto, If, Inquire, Nullify, Open, Print, Read, Return, Rewind,
                Stop, Wait, WhereStmt, Write, ArithmeticIf, ComputedGoto,
-               AssignedGoto, Pause, PreProcessor, ExternalFunc]
+               AssignedGoto, Pause, PreProcessor, Macros]
 # GeneralAssignment = Assignment + PointerAssignment
 # EndFunction, EndProgram, EndSubroutine - part of the corresponding blocks
 

@@ -23,7 +23,7 @@ __all__ = ['GeneralAssignment',
            'FinalBinding', 'Allocatable', 'Asynchronous', 'Bind', 'Else', 'ElseIf',
            'Case', 'WhereStmt', 'ElseWhere', 'Enumerator', 'FortranName', 'Threadsafe',
            'Depend', 'Check', 'CallStatement', 'CallProtoArgument', 'Pause',
-           'Comment', 'PreProcessor','ExternalFunc']
+           'Comment', 'PreProcessor','Macros']
 
 # !! block_statements.py => fill R214, action_stmt !!
 
@@ -316,7 +316,7 @@ class Continue(Statement):
         return
 
 
-class ExternalFunc(Statement):
+class Macros(Statement):
     """
     other function calls UPPER CASE ONLY WITH UNDERSCORE e.g. CHKERRQ in PETSc
     """
@@ -570,7 +570,7 @@ class Allocate(Statement):
         i = line2.find('::')
         if i != -1:
             spec = item2.apply_map(line2[:i].rstrip())
-            from block_statements import type_spec
+            from .block_statements import type_spec
             stmt = None
             for cls in type_spec:
                 if cls.match(spec):
@@ -1036,8 +1036,8 @@ class Use(Statement):
         if self.name not in modules:
             fn = self.reader.find_module_source_file(self.name)
             if fn is not None:
-                from readfortran import FortranFileReader
-                from parsefortran import FortranParser
+                from .readfortran import FortranFileReader
+                from .parsefortran import FortranParser
                 self.info('looking module information from %r' % (fn))
                 reader = FortranFileReader(fn, include_dirs=self.reader.include_dirs, source_only=self.reader.source_only)
                 parser = FortranParser(reader)

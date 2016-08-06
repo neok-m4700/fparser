@@ -44,7 +44,10 @@ class FortranParser(object):
 
     def get_item(self):
         try:
-            item = self.reader.next(ignore_comments=self.ignore_comments)
+            _ = self.reader.ignore_comments
+            self.reader.ignore_comments = self.ignore_comments
+            item = next(self.reader) # .next(ignore_comments=self.ignore_comments)
+            self.reader.ignore_comments = _
             return item
         except StopIteration:
             pass
@@ -61,7 +64,9 @@ class FortranParser(object):
             block = self.block = BeginSource(self)
         except KeyboardInterrupt:
             raise
-        except:
+        except Exception as e:
+            print(e)
+            logging.debug(str(e))
             reader = self.reader
             while reader is not None:
                 message = reader.format_message('FATAL ERROR',

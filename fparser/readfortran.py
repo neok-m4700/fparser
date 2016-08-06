@@ -80,6 +80,7 @@ import sys
 import tempfile
 import traceback
 import logging
+import sys
 # from cStringIO import StringIO
 try:
     from cStringIO import StringIO
@@ -398,13 +399,14 @@ class FortranReaderBase(object):
 
         self.exit_on_error = True
         self.restore_cache = []
+        self.ignore_comments = False
         return
 
     def __repr__(self):
         return '%s(%r, %r, %r)' % (self.__class__.__name__, self.source, self.isfree, self.isstrict)
 
     def find_module_source_file(self, mod_name):
-        from utils import get_module_file, module_in_file
+        from .utils import get_module_file, module_in_file
         if self.source_only:
             for sf in self.source_only:
                 if module_in_file(mod_name, sf):
@@ -528,7 +530,7 @@ class FortranReaderBase(object):
         if self.isclosed:
             return None
         try:
-            line = self.source.next()
+            line = next(self.source)
         except StopIteration:
             self.isclosed = True
             self.close_source()
@@ -567,7 +569,11 @@ class FortranReaderBase(object):
         """ Return next item.
         """
         try:
-            item = self.next(ignore_comments=True)
+            _ = self.ignore_comments
+            self.ignore_comments = True
+            # item = self.next(ignore_comments=True)  #  ignore_comments=True
+            item = next(self)
+            self.ignore_comments = _
         except StopIteration:
             return
         return item
@@ -585,7 +591,7 @@ class FortranReaderBase(object):
         """
         return self
 
-    def next(self, ignore_comments=False):
+    def __next__(self):  #  , ignore_comments=False
         """ Return the next Fortran code item.
 
         Include statements are realized.
@@ -604,10 +610,10 @@ class FortranReaderBase(object):
             if self.reader is not None:
                 # inside INCLUDE statement
                 try:
-                    return self.reader.next()
+                    return next(self.reader)
                 except StopIteration:
                     self.reader = None
-            item = self._next(ignore_comments)
+            item = self._next(self.ignore_comments)
             if isinstance(item, Line) and _is_include_line(item.line):
                 # catch INCLUDE statement and create a new FortranReader
                 # to enter to included file.
@@ -621,26 +627,25 @@ class FortranReaderBase(object):
                         break
                 if not os.path.isfile(path):  # include file does not exist
                     dirs = os.pathsep.join(include_dirs)
-                    # According to Fortran standard, INCLUDE line is
-                    # not a Fortran statement.
-                    reader.warning('%r not found in %r. INCLUDE line treated as comment line.'
-                                   % (filename, dirs), item)
-                    item = self.next(ignore_comments)
+                    # According to Fortran standard, INCLUDE line is  not a Fortran statement.
+                    reader.warning('%r not found in %r. INCLUDE line treated as comment line.' % (filename, dirs), item)
+                    item = next(self.next)
                     return item
-                    # To keep the information, we are turning the
-                    # INCLUDE line to a comment:
+                    # To keep the information, we are turning the INCLUDE line to a comment:
                     reader.warning('%r not found in %r. '
                                    'The INCLUDE line will be turned to a comment.'
                                    % (filename, dirs), item)
-                    return self.comment_item('!' + item.get_line(apply_map=True),
-                                             item.span[0], item.span[1])
+                    return self.comment_item('!' + item.get_line(apply_map=True), item.span[0], item.span[1])
                 reader.info('including file %r' % (path), item)
                 self.reader = FortranFileReader(path, include_dirs=include_dirs)
-                return self.reader.next(ignore_comments=ignore_comments)
+                self.reader.ignore_comments = self.ignore_comments
+                return next(self.reader)
             return item
         except StopIteration:
             raise
-        except:
+        except Exception as e:
+            print(e)
+            logging.debug(str(e))
             message = self.format_message('FATAL ERROR',
                                           'while processing line',
                                           self.linecount, self.linecount)
@@ -882,9 +887,9 @@ class FortranReaderBase(object):
                     put_item(self.comment_item(line[i:], lineno, lineno))
                     return newline, quotechar, True
         # handle cases where comment char may be a part of a character content
-        #splitter = LineSplitter(line, quotechar)
-        #items = [item for item in splitter]
-        #newquotechar = splitter.quotechar
+        # splitter = LineSplitter(line, quotechar)
+        # items = [item for item in splitter]
+        # newquotechar = splitter.quotechar
         items, newquotechar = splitquote(line, quotechar)
 
         noncomment_items = []
@@ -1003,8 +1008,7 @@ class FortranReaderBase(object):
             for i in range(min(5, len(line))):
                 # check that fixed format line starts according to Fortran standard
                 if line[i] not in _spacedigits:
-                    message =  'non-space/digit char %r found in column %i'\
-                        ' of fixed Fortran code' % (line[i], i + 1)
+                    message = 'non-space/digit char %r found in column %i of fixed Fortran code' % (line[i], i + 1)
                     if i == 0:
                         message += ', interpreting line as comment line'
                     if self.isfix:
@@ -1196,7 +1200,7 @@ class FortranReaderBase(object):
         if name is not None:
             self.error('No construct following construct-name.')
         if have_comment:
-            return self.next()
+            return next(self)
         return self.comment_item('', startlineno, endlineno)
 
     # FortranReaderBase
@@ -1252,7 +1256,7 @@ cf2py call me ! hey
       end
      '"""
     reader = FortranStringReader(string_f77)
-    assert reader.mode == 'fix77', repr(reader.mode)
+    assert reader.mode == 'f77', repr(reader.mode)
     for item in reader:
         print(item)
 
@@ -1321,7 +1325,7 @@ cComment
       end
 """
     reader = FortranStringReader(string_fix90)
-    assert reader.mode == 'fix90', repr(reader.mode)
+    assert reader.mode == 'fix', repr(reader.mode)
     for item in reader:
         print(item)
 
@@ -1346,10 +1350,3 @@ def profile_main():
     stats.strip_dirs()
     stats.sort_stats('time', 'calls')
     stats.print_stats(30)
-
-if __name__ == "__main__":
-    # test_pyf()
-    # test_fix90()
-    # test_f77()
-    # profile_main()
-    simple_main()

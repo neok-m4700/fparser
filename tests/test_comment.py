@@ -1,6 +1,7 @@
 
 from fparser.api import parse
 
+
 def test_comment_lines():
     source_str = '''\
   !comment line 1
@@ -15,7 +16,8 @@ end module foo
     '''
     tree = parse(source_str, isfree=True, isstrict=False,
                  ignore_comments=False)
-    assert str(tree).strip().split('\n')[1:]=='''
+    print('I parsed', tree)
+    assert str(tree).strip().split('\n')[1:] == '''
 !BEGINSOURCE <cStringIO.StringI object at 0x1518de0> mode=free90
   !comment line 1
 
@@ -29,7 +31,7 @@ end module foo
   END MODULE foo
 '''.strip().split('\n')[1:]
 
-    assert tree.asfix().strip().split('\n')[1:]=='''
+    assert tree.asfix().strip().split('\n')[1:] == '''
 C      BEGINSOURCE <cStringIO.StringI object at 0x1630de0> mode=free90
 C       comment line 1
 
@@ -42,6 +44,7 @@ C           comment line 4
 C         comment line 5
         END MODULE foo
 '''.strip().split('\n')[1:]
+
 
 def test_labels():
     source_str = '''\
@@ -59,7 +62,7 @@ end subroutine foo
 '''
     tree = parse(source_str, isfree=True, isstrict=False,
                  ignore_comments=False)
-    assert str(tree).strip().split('\n')[1:]=='''
+    assert str(tree).strip().split('\n')[1:] == '''
 !BEGINSOURCE <cStringIO.StringI object at 0x2952e70> mode=free90
   SUBROUTINE foo()
     REAL a
@@ -89,7 +92,7 @@ end subroutine foo
 '''
     tree = parse(source_str, isfree=False, isstrict=False,
                  ignore_comments=False)
-    assert str(tree).strip().split('\n')[1:]=='''
+    assert str(tree).strip().split('\n')[1:] == '''
 !      BEGINSOURCE <cStringIO.StringI object at 0x1d3b390> mode=fix90
         SUBROUTINE foo()
           REAL a
@@ -103,3 +106,8 @@ end subroutine foo
           END DO l1
         END SUBROUTINE foo
 '''.strip().split('\n')[1:]
+
+
+if __name__ == '__main__':
+  test_comment_lines()
+  test_labels()
